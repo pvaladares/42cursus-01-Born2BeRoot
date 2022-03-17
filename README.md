@@ -22,3 +22,24 @@ This project aims to introduce you to the wonderful world of virtualization.
  * Now just `Start` the VM to start the installation procedure of Debian.
 
 # Debian Installation
+
+* Select `Install` instead of any other option (remember, no graphical install is allowed)
+* Language: select default `English`
+* Location: select `other`, `Europe` and then `Portugal`
+* Local configuration: select default `United States`
+* Keyboard: `American English`
+> The hostname of your virtual machine must be your login ending with 42 (e.g., wil42)
+* Hostname: `pvaladar42`
+* Domain name: *empty*
+> You have to implement a strong password policy.
+> To set up a strong password policy, you have to comply with the following require- ments:
+> - (...)
+> - Your password must be at least 10 characters long. It must contain an uppercase letter and a number. Also, it must not contain more than 3 consecutive identical characters.
+> - The password must not include the name of the user.
+* Root password: *see rules above*
+* User account:
+ * Full name: `Pedro Valadares`
+ * Username: `pvaladar`
+ * Password: *see rules above*
+> In addition to the root user, a user with your login as username has to be present.
+* Timezone: `Lisbon`

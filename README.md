@@ -4,7 +4,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 # Virtual Machine (VirtualBox)
 
-1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png). To be noted that at the time of writing the latest version of VirtualBox is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privilities to install it nor it is available on the Managed Software Center. So VirtualBox is indeed the mandatory software to be used on this project.
+1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png). To be noted that at the time of writing the latest version is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privileges to install it nor it is available on the `Managed Software Center` to download/install. So `VirtualBox` is indeed the mandatory software to be used on this project.
 
 2 - [Download](https://www.debian.org/download) the latest stable version of Debian and place it on `goinfre` folder (since it is less restrictive on size limits).
 
@@ -23,23 +23,31 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 # Debian Installation
 
-* Select `Install` instead of any other option (remember, no graphical install is allowed)
-* Language: select default `English`
-* Location: select `other`, `Europe` and then `Portugal`
-* Local configuration: select default `United States`
-* Keyboard: `American English`
+## General
+* [Select](img/Install/1.png) `Install` instead of any other option (remember, no graphical install is allowed)
+* [Language](img/Install/2.png): select default `English`
+* [Location](img/Install/3.png): select `other`, `Europe` and then `Portugal`
+* [Local configuration](img/Install/4.png): select default `United States`
+* [Keyboard](img/Install/5.png): `American English`
 > The hostname of your virtual machine must be your login ending with 42 (e.g., wil42)
 * Hostname: `pvaladar42`
-* Domain name: *empty*
+* [Domain name](img/Install/7.png): *empty*
 > You have to implement a strong password policy.
-> To set up a strong password policy, you have to comply with the following require- ments:
+> 
+> To set up a strong password policy, you have to comply with the following requirements:
 > - (...)
 > - Your password must be at least 10 characters long. It must contain an uppercase letter and a number. Also, it must not contain more than 3 consecutive identical characters.
 > - The password must not include the name of the user.
 * Root password: *see rules above*
-* User account:
- * Full name: `Pedro Valadares`
- * Username: `pvaladar`
- * Password: *see rules above*
 > In addition to the root user, a user with your login as username has to be present.
+* User account:
+  * [Full name](img/Install/8.png): `Pedro Valadares`
+  * [Username](img/Install/9.png): `pvaladar`
+ * Password: *see rules above*
 * Timezone: `Lisbon`
+
+## Disk
+
+
+# Resources
+* [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)

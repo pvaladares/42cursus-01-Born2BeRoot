@@ -30,7 +30,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 * [Local configuration](img/Install/4.png): select default `United States`
 * [Keyboard](img/Install/5.png): `American English`
 > The hostname of your virtual machine must be your login ending with 42 (e.g., wil42)
-* Hostname: `pvaladar42`
+* [Hostname](img/Install/6.png): `pvaladar42`
 * [Domain name](img/Install/7.png): *empty*
 > You have to implement a strong password policy.
 > 
@@ -44,7 +44,7 @@ This project aims to introduce you to the wonderful world of virtualization.
   * [Full name](img/Install/8.png): `Pedro Valadares`
   * [Username](img/Install/9.png): `pvaladar`
  * Password: *see rules above*
-* Timezone: `Lisbon`
+* [Timezone](img/Install/10.png): `Lisbon`
 
 ## Disk
 

@@ -48,6 +48,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 ## Disk
 
+* For the disk there is a really nice tutorial [here](https://youtu.be/OQEdjt38ZJA?t=185).
 
 # Resources
 * [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)

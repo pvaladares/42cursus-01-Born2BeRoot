@@ -46,12 +46,11 @@ This project aims to introduce you to the wonderful world of virtualization.
  * Password: *see rules above*
 * [Timezone](img/Install/10.png): `Lisbon`
 
-## Disk
+## Disk partition
 
 * For the disk there is a really nice tutorial [here](https://youtu.be/OQEdjt38ZJA?t=185).
 
-
-## Final installation details
+## Final installation steps
 
 * Configure the package manager:
   * [Scan extra installation media](img/Install/11.png): choose `No`
@@ -64,6 +63,15 @@ This project aims to introduce you to the wonderful world of virtualization.
   * [Install the GRUB boot loader to your primary drive](img/Install/17.png): choose `Yes`
   * [Device for boot loader installation](img/Install/18.png): choose `/dev/sda`
 * [Finish the installation](img/Install/19.png): choose `Continue`
+
+## Reboot, unlock the disk, login and check disk partitions
+
+* Now the machine will reboot and the [GRUB boot loader will show the Debian](img/Install/20.png) and load it by default, if nothing is pressed
+* Type the [unlock disk password](img/Install/21.png), previously set during the installation, to unlock the disk
+* Then type the [username `pvaladar` and the associated password](img/Install/22.png)
+* In order to cross-check the disk partition *versus* the subject (in this case the bonus), use the [`lsblk` utility](img/Install/23.png)
+
+
 
 # Resources
 * [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)

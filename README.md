@@ -38,7 +38,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 > - (...)
 > - Your password must be at least 10 characters long. It must contain an uppercase letter and a number. Also, it must not contain more than 3 consecutive identical characters.
 > - The password must not include the name of the user.
-* Root password: *see rules above*
+* Root password: *see rules above* (use a strong password generator like [here](https://passwordsgenerator.net/))
 > In addition to the root user, a user with your login as username has to be present.
 * User account:
   * [Full name](img/Install/8.png): `Pedro Valadares`

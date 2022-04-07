@@ -29,10 +29,10 @@ This project aims to introduce you to the wonderful world of virtualization.
 * [Location](img/Install/3.png): select `other`, `Europe` and then `Portugal`
 * [Local configuration](img/Install/4.png): select default `United States`
 * [Keyboard](img/Install/5.png): `American English`
-> The hostname of your virtual machine must be your login ending with 42 (e.g., wil42)
+> - The hostname of your virtual machine must be your login ending with 42 (e.g., wil42)
 * [Hostname](img/Install/6.png): `pvaladar42`
 * [Domain name](img/Install/7.png): *empty*
-> You have to implement a strong password policy.
+> - You have to implement a strong password policy.
 > 
 > To set up a strong password policy, you have to comply with the following requirements:
 > - (...)
@@ -46,7 +46,7 @@ This project aims to introduce you to the wonderful world of virtualization.
  * Password: *see rules above*
 * [Timezone](img/Install/10.png): `Lisbon`
 
-## 2.2 Disk partition
+## 2.2 Disk partition (with bonus)
 
 * For the disk there is a really nice tutorial [here](https://youtu.be/OQEdjt38ZJA?t=185).
 
@@ -71,21 +71,78 @@ This project aims to introduce you to the wonderful world of virtualization.
 * Then type the [username `pvaladar` and the associated password](img/Install/22.png)
 * In order to cross-check the disk partition *versus* the subject (in this case the bonus), use the [`lsblk` utility](img/Install/23.png)
 
-# 3. SSH
+# 3 Mandatory part
 
-# 3.1 Installation
-* Access super user privileges by typing `su` and entering the previously set password
+## 3.1 APT and SUDO
+* First procedure would be login as root `su` and upgdate & upgrade the default package manager APT *(Advanced Packaging Tool)* `apt update && apt upgrade`. For more information install man `apt install man` and read the docs `man apt`
+> You have to install and configure sudo following strict rules
+* The second step is to install sudo since there are several requirements with permissions of users/groups, etc. that need to be modified/set: `apt install sudo`
+
+# 3.2 Adding in groups
+
+> - In addition to the root user, a user with your login as username has to be present.
+>
+> - This user has to belong to the `user42` and `sudo` groups.
+
+* Add the user to sudo `sudo adduser msousa sudo`
+* Create the group `sudo addgroup user42`
+* Add the user to user42 `sudo adduser pvaladar user42`
+* Verify if user is correctly added to the groups: `getent group sudo` and `getent group user42`
+
+## 3.2 SSH
+
+### 3.2.1 Installation
+* Access super user privileges by typing [`su`](https://man7.org/linux/man-pages/man1/su.1.html) and entering the previously set password
 * Install SSH by typing `apt install openssh-server -y`
 * Make the following checks around openssh-server:
   * It is installed: `dpkg -l | grep ssh`
   * It is active (running): `systemctl status ssh`
 
-# 3.2 Configuration
+### 3.2.2 Configuration
  
-* Edit the configuration file using `vi` or `nano`, e.g.:  `nano /etc/ssh/sshd_config`
+* Edit the configuration file `/etc/ssh/sshd_config` using the default editors `vi` or `nano` or install `vim` (using command `apt install vim` and then for better user experience show the numbers on the editor using command `set number`)
 > A SSH service will be running on port 4242 only.
-* Replace `# Port 22` by `Port 4242`
+* On line 15, replace `#Port 22` by `Port 4242`
+* Double-check the port is correctly configured by using command `cat /etc/ssh/sshd_config | grep Port`
 > For security reasons, it must not be possible to connect using SSH as root.
+* On line 34, replace `#PermitRootLogin prohibit-password` by `PermitRootLogin no`
+* Double-check the root permission is correctly configured by using command `cat /etc/ssh/sshd_config | grep PermitRootLogin`
+* Now need to restart the SSH service to replace the new port, type `systemctl restart ssh` and then `systemctl status ssh`, [it should be read something like *Server listening on 0.0.0. port 4242*](img/VM/8.png)
+
+### 3.2.3 Connection from terminal
+
+* Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
+* On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` to end the connection
+
+### 3.3 5 Setting up a strong password policy
+
+Use editor to change the target file: `vim /etc/login.defs`
+
+> To set up a strong password policy, you have to comply with the following requirements:
+>
+> - Your password has to expire every 30 days.
+* On line 160, replace `PASS_MAX_DAYS    99999` by `PASS_MAX_DAYS    30`
+> - The minimum number of days allowed before the modification of a password will be set to 2.
+* On line 161, replace `PASS_MIN_DAYS    0` by `PASS_MIN_DAYS    2`
+> - The user has to receive a warning message 7 days before their password expires.
+* On line 162, there is no need to change since `PASS_WARN_AGE` is already 7 by default.
+> - Your password must be at least 10 characters long. It must contain an uppercase letter and a number. Also, it must not contain more than 3 consecutive identical characters. The password must not include the name of the user.
+> - The following rule does not apply to the root password: The password must have at least 7 characters that are not part of the former password.
+> - Of course, your root passwo
+
+sudo apt-get install libpam-pwquality
+sudo vi /etc/pam.d/common-password
+Add to the end of the password requisite pam_pwqiality.so retry=3 line:
+
+minlen=10 ucredit=-1 dcredit=-1 maxrepeat=3 reject_username difok=7 enforce_for_root
+Change previous passwords.
+
+passwd
+sudo passwd
+
+
+
+# 4 Bonus part
 
 
 # Resources

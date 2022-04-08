@@ -2,7 +2,7 @@
 This project aims to introduce you to the wonderful world of virtualization.
 
 
-# 1. Virtual Machine (VirtualBox)
+# Virtual Machine (VirtualBox)
 
 1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png). To be noted that at the time of writing the latest version is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privileges to install it nor it is available on the `Managed Software Center` to download/install. So `VirtualBox` is indeed the mandatory software to be used on this project.
 
@@ -21,9 +21,9 @@ This project aims to introduce you to the wonderful world of virtualization.
  
  * Now just `Start` the VM to start the installation procedure of Debian.
 
-# 2. Debian Installation
+# Debian Installation
 
-## 2.1 General
+## General
 * [Select](img/Install/1.png) `Install` instead of any other option (remember, no graphical install is allowed)
 * [Language](img/Install/2.png): select default `English`
 * [Location](img/Install/3.png): select `other`, `Europe` and then `Portugal`
@@ -46,11 +46,11 @@ This project aims to introduce you to the wonderful world of virtualization.
  * Password: *see rules above*
 * [Timezone](img/Install/10.png): `Lisbon`
 
-## 2.2 Disk partition (with bonus)
+## Disk partition (with bonus)
 
 * For the disk there is a really nice tutorial [here](https://youtu.be/OQEdjt38ZJA?t=185).
 
-## 2.3 Final installation steps
+## Final installation steps
 
 * Configure the package manager:
   * [Scan extra installation media](img/Install/11.png): choose `No`
@@ -64,41 +64,41 @@ This project aims to introduce you to the wonderful world of virtualization.
   * [Device for boot loader installation](img/Install/18.png): choose `/dev/sda`
 * [Finish the installation](img/Install/19.png): choose `Continue`
 
-## 2.4 Reboot, unlock the disk, login and check disk partitions
+## Reboot, unlock the disk, login and check disk partitions
 
 * Now the machine will reboot and the [GRUB boot loader will show the Debian](img/Install/20.png) and load it by default, if nothing is pressed
 * Type the [unlock disk password](img/Install/21.png), previously set during the installation, to unlock the disk
 * Then type the [username `pvaladar` and the associated password](img/Install/22.png)
 * In order to cross-check the disk partition *versus* the subject (in this case the bonus), use the [`lsblk` utility](img/Install/23.png)
 
-# 3 Mandatory part
+# Mandatory part
 
-## 3.1 APT and SUDO
+## APT and SUDO
 * First procedure would be login as root `su` and upgdate & upgrade the default package manager APT *(Advanced Packaging Tool)* `apt update && apt upgrade`. For more information install man `apt install man` and read the docs `man apt`
 > You have to install and configure sudo following strict rules
 * The second step is to install sudo since there are several requirements with permissions of users/groups, etc. that need to be modified/set: `apt install sudo`
 
-# 3.2 Adding in groups
+## Adding in groups
 
 > - In addition to the root user, a user with your login as username has to be present.
 >
 > - This user has to belong to the `user42` and `sudo` groups.
 
-* Add the user to sudo `sudo adduser msousa sudo`
+* Add the user to sudo `sudo adduser pvaladar sudo`
 * Create the group `sudo addgroup user42`
 * Add the user to user42 `sudo adduser pvaladar user42`
-* Verify if user is correctly added to the groups: `getent group sudo` and `getent group user42`
+* Verify if the user is correctly added to the groups: `getent group sudo` and `getent group user42`
 
-## 3.2 SSH
+## SSH
 
-### 3.2.1 Installation
+### Installation
 * Access super user privileges by typing [`su`](https://man7.org/linux/man-pages/man1/su.1.html) and entering the previously set password
 * Install SSH by typing `apt install openssh-server -y`
 * Make the following checks around openssh-server:
   * It is installed: `dpkg -l | grep ssh`
   * It is active (running): `systemctl status ssh`
 
-### 3.2.2 Configuration
+### Configuration
  
 * Edit the configuration file `/etc/ssh/sshd_config` using the default editors `vi` or `nano` or install `vim` (using command `apt install vim` and then for better user experience show the numbers on the editor using command `set number`)
 > A SSH service will be running on port 4242 only.
@@ -109,12 +109,12 @@ This project aims to introduce you to the wonderful world of virtualization.
 * Double-check the root permission is correctly configured by using command `cat /etc/ssh/sshd_config | grep PermitRootLogin`
 * Now need to restart the SSH service to replace the new port, type `systemctl restart ssh` and then `systemctl status ssh`, [it should be read something like *Server listening on 0.0.0. port 4242*](img/VM/8.png)
 
-### 3.2.3 Connection from terminal
+### Connection from terminal
 
 * Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
 * On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` to end the connection
 
-### 3.3 5 Setting up a strong password policy
+## Setting up a strong password policy
 
 Use editor to change the target file: `vim /etc/login.defs`
 
@@ -147,3 +147,5 @@ sudo passwd
 
 # Resources
 * [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)
+* [Oracle VM VirtualBox: Networking options and how-to manage them]
+(https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)

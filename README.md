@@ -126,10 +126,10 @@ In order to enforce the remaining rules there is the package `pwquality` that ca
 apt install libpam-pwquality
 ```
 
-Use editor to change the target file: `/etc/pam.d/common-password` and add the following at the end of the file:
+Use editor to change the target file: `/etc/pam.d/common-password` and add the following to the right of `pam_pwquality.so retry=3`:
 
 ```bash
-minlen=10 ucredit=-1 dcredit=-1 maxrepeat=3 reject_username enforce_for_root
+minlen=10 ucredit=-1 dcredit=-1 maxrepeat=3 reject_username difok=7 enforce_for_root
 ```
 
 Below it is explained each argument as per the subject requirements.
@@ -143,14 +143,22 @@ Below it is explained each argument as per the subject requirements.
 > - The password must not include the name of the user.
 * `reject_username`
 > - The following rule does not apply to the root password: The password must have at least 7 characters that are not part of the former password.
+* `difok=7`
 > - Of course, your root password has to comply with this policy.
 * `enforce_for_root`
 
 
 ### 3.3.3 - [sudoers - default sudo security policy plugin](https://man7.org/linux/man-pages/man5/sudoers.5.html)
 
-Edit the sudoers file in order to comply with requirements, by using the command `sudo visudo`
+Edit the sudoers `/etc/sudoers` file in order to comply with requirements, by using the command `sudo visudo`
 
+See that they recommend the following:
+```bash
+# Please consider adding local content in /etc/sudoers.d/ instead of
+# directly modifying this file
+```
+
+So create the following file `/etc/sudoers.d/sudoconfig` and add the content:
 ```bash
 Defaults    passwd_tries=3
 Defaults    badpass_message="42 Message: Incorrect sudo password, you have a total of 3 tries."
@@ -161,10 +169,10 @@ Defaults    secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin
 ```
 
 > To set up a strong configuration for your sudo group, you have to comply with the following requirements:
-> - Authentication using sudo has to be limited to 3 attempts in the event of an incor- rect password.
+> - Authentication using sudo has to be limited to 3 attempts in the event of an incorrect password.
 * `Defaults    passwd_tries=3`
 > - A custom message of your choice has to be displayed if an error due to a wrong password occurs when using sudo.
-* `Defaults    badpass_message="Incorrect sudo password, you have a total of 3 tries."`
+* `Defaults    badpass_message="42 Message: Incorrect sudo password, you have a total of 3 tries."`
 > - Each action using sudo has to be archived, both inputs and outputs. The log file has to be saved in the /var/log/sudo/ folder.
 * `Defaults    log_input,log_output`
 > - The TTY mode has to be enabled for security reasons.

@@ -85,9 +85,9 @@ This project aims to introduce you to the wonderful world of virtualization.
 >
 > - This user has to belong to the `user42` and `sudo` groups.
 
-* Add the user to sudo `adduser pvaladar sudo`
-* Create the group `addgroup user42`
-* Add the user to user42 `adduser pvaladar user42`
+* Add the user to sudo `sudo adduser pvaladar sudo`
+* Create the group `sudo addgroup user42`
+* Add the user to user42 `sudo adduser pvaladar user42`
 * Verify if the user is correctly added to the groups: `getent group sudo` and `getent group user42`
 *Note: Another way would be to use the following command: `usermod -aG sudo pvaladar`*
 
@@ -105,6 +105,18 @@ Use editor to change the target file: `/etc/login.defs`
 * On line 161, replace `PASS_MIN_DAYS    0` by `PASS_MIN_DAYS    2`
 > - The user has to receive a warning message 7 days before their password expires.
 * On line 162, there is no need to change since `PASS_WARN_AGE` is already 7 by default.
+
+
+Notice that on line 296 it is mentioned that another file needs to be edited on folder `/etc/pam.d/`
+```bash
+################# OBSOLETED BY PAM ##############
+#                                               #
+# These options are now handled by PAM. Please  #
+# edit the appropriate file in /etc/pam.d/ to   #
+# enable the equivelants of them.
+#
+###############
+```
 
 ### 3.3.2 - [pam_pwquality - PAM module to perform password quality checking](https://manpages.debian.org/jessie/libpam-pwquality/pam_pwquality.8.en.html)
 
@@ -166,6 +178,13 @@ Just need to create the folder to store the logs
 
 ```bash
 mkdir /var/log/sudo
+```
+
+Make finals tests by changing the previously passwords set for username and root:
+
+```bash
+passwd
+sudo passwd
 ```
 
 ## 3.4 SSH

@@ -2,7 +2,7 @@
 This project aims to introduce you to the wonderful world of virtualization.
 
 
-# Virtual Machine (VirtualBox)
+# 1 - Virtual Machine (VirtualBox)
 
 1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png). To be noted that at the time of writing the latest version is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privileges to install it nor it is available on the `Managed Software Center` to download/install. So `VirtualBox` is indeed the mandatory software to be used on this project.
 
@@ -14,16 +14,17 @@ This project aims to introduce you to the wonderful world of virtualization.
 * Leave [memory size](img/VM/4.png) as default `1024 MB`
 
 4 - If doing the **bonus**, since there is a limitation with the 5.2.20 version use the workaround described below:
-> Note: The 5.2.20 version that can be used at 42 has a [limitation/bug](https://www.virtualbox.org/ticket/18177) with impact on the bonus, since it will not be possible to set a disk with size 30.8G
+
+*Note: The 5.2.20 version that can be used at 42 has a [limitation/bug](https://www.virtualbox.org/ticket/18177) with impact on the bonus, since it will not be possible to set a disk with size 30.8G*
   * Go to terminal, and still at `goinfre` user folder, type `VBoxManage createhd --filename Born2beRoot_DISK_31G54.vdi --size 31540 --format VDI`
   * Choose `Use an existing virtual hard disk file` and [select the newly created file](img/VM/5.png)
   * [Go to](img/VM/6.png) `Settings` and `Storage`, under `Storage Devices` choose `Empty` and then click on the "CD/Disk" icon on the right of the `Optical Drive` and select option `Choose Virtual Optical Disk File...`; [Select](img/VM/7.png) the debian ISO file that was privously saved on goinfre
  
  * Now just `Start` the VM to start the installation procedure of Debian.
 
-# Debian Installation
+# 2 - Debian Installation
 
-## General
+## 2.1 - General
 * [Select](img/Install/1.png) `Install` instead of any other option (remember, no graphical install is allowed)
 * [Language](img/Install/2.png): select default `English`
 * [Location](img/Install/3.png): select `other`, `Europe` and then `Portugal`
@@ -46,11 +47,11 @@ This project aims to introduce you to the wonderful world of virtualization.
  * Password: *see rules above*
 * [Timezone](img/Install/10.png): `Lisbon`
 
-## Disk partition (with bonus)
+## 2.2 - Disk partition (with bonus)
 
 * For the disk there is a really nice tutorial [here](https://youtu.be/OQEdjt38ZJA?t=185).
 
-## Final installation steps
+## 2.3 - Final installation steps
 
 * Configure the package manager:
   * [Scan extra installation media](img/Install/11.png): choose `No`
@@ -64,43 +65,121 @@ This project aims to introduce you to the wonderful world of virtualization.
   * [Device for boot loader installation](img/Install/18.png): choose `/dev/sda`
 * [Finish the installation](img/Install/19.png): choose `Continue`
 
-## Reboot, unlock the disk, login and check disk partitions
+## 2.4 - Reboot, unlock the disk, login and check disk partitions
 
 * Now the machine will reboot and the [GRUB boot loader will show the Debian](img/Install/20.png) and load it by default, if nothing is pressed
 * Type the [unlock disk password](img/Install/21.png), previously set during the installation, to unlock the disk
 * Then type the [username `pvaladar` and the associated password](img/Install/22.png)
 * In order to cross-check the disk partition *versus* the subject (in this case the bonus), use the [`lsblk` utility](img/Install/23.png)
 
-# Mandatory part
+# 3 - Mandatory part
 
-## APT and SUDO
-* First procedure would be login as root `su` and upgdate & upgrade the default package manager APT *(Advanced Packaging Tool)* `apt update && apt upgrade`. For more information install man `apt install man` and read the docs `man apt`
+## 3.1 - `apt` and `sudo`
+* First procedure would be login as root [`su --login`](https://man7.org/linux/man-pages/man1/su.1.html) and upgdate & upgrade the default package manager APT *(Advanced Packaging Tool)* `apt update && apt upgrade`. For more information install man `apt install man` and read the docs `man apt`
 > You have to install and configure sudo following strict rules
 * The second step is to install sudo since there are several requirements with permissions of users/groups, etc. that need to be modified/set: `apt install sudo`
 
-## Adding in groups
+## 3.2 - Adding in groups
 
 > - In addition to the root user, a user with your login as username has to be present.
 >
 > - This user has to belong to the `user42` and `sudo` groups.
 
-* Add the user to sudo `sudo adduser pvaladar sudo`
-* Create the group `sudo addgroup user42`
-* Add the user to user42 `sudo adduser pvaladar user42`
+* Add the user to sudo `adduser pvaladar sudo`
+* Create the group `addgroup user42`
+* Add the user to user42 `adduser pvaladar user42`
 * Verify if the user is correctly added to the groups: `getent group sudo` and `getent group user42`
+*Note: Another way would be to use the following command: `usermod -aG sudo pvaladar`*
 
-## SSH
+## 3.3 - Setting up a strong password policy
 
-### Installation
-* Access super user privileges by typing [`su`](https://man7.org/linux/man-pages/man1/su.1.html) and entering the previously set password
-* Install SSH by typing `apt install openssh-server -y`
+### 3.3.1 - [login.defs - shadow password suite configuration](https://manpages.debian.org/jessie/login/login.defs.5.en.html)
+
+Use editor to change the target file: `/etc/login.defs`
+
+> To set up a strong password policy, you have to comply with the following requirements:
+>
+> - Your password has to expire every 30 days.
+* On line 160, replace `PASS_MAX_DAYS    99999` by `PASS_MAX_DAYS    30`
+> - The minimum number of days allowed before the modification of a password will be set to 2.
+* On line 161, replace `PASS_MIN_DAYS    0` by `PASS_MIN_DAYS    2`
+> - The user has to receive a warning message 7 days before their password expires.
+* On line 162, there is no need to change since `PASS_WARN_AGE` is already 7 by default.
+
+### 3.3.2 - [pam_pwquality - PAM module to perform password quality checking](https://manpages.debian.org/jessie/libpam-pwquality/pam_pwquality.8.en.html)
+
+In order to enforce the remaining rules there is the package `pwquality` that can handle it for us:
+
+```bash
+apt install libpam-pwquality
+```
+
+Use editor to change the target file: `/etc/pam.d/common-password` and add the following at the end of the file:
+
+```bash
+minlen=10 ucredit=-1 dcredit=-1 maxrepeat=3 reject_username enforce_for_root
+```
+
+Below it is explained each argument as per the subject requirements.
+
+> - Your password must be at least 10 characters long. 
+* `minlen=10`
+> - It must contain an uppercase letter and a number. 
+* `ucredit=-1` and `dcredit=-1`
+> - Also, it must not contain more than 3 consecutive identical characters. 
+* `maxrepeat=3`
+> - The password must not include the name of the user.
+* `reject_username`
+> - The following rule does not apply to the root password: The password must have at least 7 characters that are not part of the former password.
+> - Of course, your root password has to comply with this policy.
+* `enforce_for_root`
+
+
+### 3.3.3 - [sudoers - default sudo security policy plugin](https://man7.org/linux/man-pages/man5/sudoers.5.html)
+
+Edit the sudoers file in order to comply with requirements, by using the command `sudo visudo`
+
+```bash
+Defaults    passwd_tries=3
+Defaults    badpass_message="42 Message: Incorrect sudo password, you have a total of 3 tries."
+Defaults    log_input,log_output
+Defaults    iolog_dir="/var/log/sudo"
+Defaults    requiretty
+Defaults    secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+```
+
+> To set up a strong configuration for your sudo group, you have to comply with the following requirements:
+> - Authentication using sudo has to be limited to 3 attempts in the event of an incor- rect password.
+* `Defaults    passwd_tries=3`
+> - A custom message of your choice has to be displayed if an error due to a wrong password occurs when using sudo.
+* `Defaults    badpass_message="Incorrect sudo password, you have a total of 3 tries."`
+> - Each action using sudo has to be archived, both inputs and outputs. The log file has to be saved in the /var/log/sudo/ folder.
+* `Defaults    log_input,log_output`
+> - The TTY mode has to be enabled for security reasons.
+* `Defaults    requiretty`
+> - For security reasons too, the paths that can be used by sudo must be restricted. 
+> > Example:
+> /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+* `Defaults    secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"`
+
+Just need to create the folder to store the logs
+
+```bash
+mkdir /var/log/sudo
+```
+
+## 3.4 SSH
+
+### 3.4.1 - Installation
+* Access super user privileges by typing `su --login` and entering the previously set password
+* Install SSH by typing `apt install openssh-server`
 * Make the following checks around openssh-server:
   * It is installed: `dpkg -l | grep ssh`
   * It is active (running): `systemctl status ssh`
 
-### Configuration
+### 3.4.2 - Configuration
  
-* Edit the configuration file `/etc/ssh/sshd_config` using the default editors `vi` or `nano` or install `vim` (using command `apt install vim` and then for better user experience show the numbers on the editor using command `set number`)
+* Edit the configuration file `/etc/ssh/sshd_config`
 > A SSH service will be running on port 4242 only.
 * On line 15, replace `#Port 22` by `Port 4242`
 * Double-check the port is correctly configured by using command `cat /etc/ssh/sshd_config | grep Port`
@@ -113,36 +192,11 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 * Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
 * On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` to end the connection
-
-## Setting up a strong password policy
-
-Use editor to change the target file: `vim /etc/login.defs`
-
-> To set up a strong password policy, you have to comply with the following requirements:
->
-> - Your password has to expire every 30 days.
-* On line 160, replace `PASS_MAX_DAYS    99999` by `PASS_MAX_DAYS    30`
-> - The minimum number of days allowed before the modification of a password will be set to 2.
-* On line 161, replace `PASS_MIN_DAYS    0` by `PASS_MIN_DAYS    2`
-> - The user has to receive a warning message 7 days before their password expires.
-* On line 162, there is no need to change since `PASS_WARN_AGE` is already 7 by default.
-> - Your password must be at least 10 characters long. It must contain an uppercase letter and a number. Also, it must not contain more than 3 consecutive identical characters. The password must not include the name of the user.
-> - The following rule does not apply to the root password: The password must have at least 7 characters that are not part of the former password.
-> - Of course, your root passwo
-
-sudo apt-get install libpam-pwquality
-sudo vi /etc/pam.d/common-password
-Add to the end of the password requisite pam_pwqiality.so retry=3 line:
-
-minlen=10 ucredit=-1 dcredit=-1 maxrepeat=3 reject_username difok=7 enforce_for_root
-Change previous passwords.
-
-passwd
-sudo passwd
+ 
 
 
 
-# 4 Bonus part
+# 9 Bonus part
 
 
 # Resources

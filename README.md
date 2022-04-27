@@ -195,7 +195,7 @@ passwd
 sudo passwd
 ```
 
-## 3.4 SSH
+## 3.4 `ssh`
 
 ### 3.4.1 - Installation
 * Access super user privileges by typing `su --login` and entering the previously set password
@@ -220,7 +220,7 @@ sudo passwd
 * Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
 * On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` to end the connection
  
-## 3.5 UFW
+## 3.5 `ufw`
 
 > You have to configure your operating system with the UFW firewall and thus leave only port 4242 open.
 > 
@@ -229,11 +229,79 @@ sudo passwd
 * Type `ufw enable` so the *Firewall is active and enabled on system startup*
 * Type `ufw allow 4242` and then `ufw status numbered`, only the port 4242 should appear on the list
 
+## 3.6 `cron`
+
+> At server startup, the script will display some information (listed below) on all terminals every 10 minutes (take a look at wall). The banner is optional. No error must be visible.
+* Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * /home/monitoring.sh`
+> Finally, you have to create a simple script called monitoring.sh. It must be developed in bash.
+
+* Create the script below and use `sudo chmod +x /home/monitoring.sh`
+
+```bash
+#!/bin/bash
+
+# • The architecture of your operating system and its kernel version.
+architecture=$(uname -a)
+
+# • The number of physical processors.
+physical_cpu=$(grep "physical id" /proc/cpuinfo | sort | uniq | wc -l)
+
+# • The number of virtual processors.
+virtual_cpu=$(grep -c ^processor /proc/cpuinfo)
+
+# • The current available RAM on your server and its utilization rate as a percentage.
+memory_usage=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
+
+# • The current available memory on your server and its utilization rate as a percentage.
+total_disk=$(df -Bg | grep '^/dev/' | grep -v '/boot$' | awk '{ft += $2} END {print ft}')
+used_disk=$(df -Bm | grep '^/dev/' | grep -v '/boot$' | awk '{ut += $3} END {print ut}')
+percent_used_disk=$(df -Bm | grep '^/dev/' | grep -v '/boot$' | awk '{ut += $3} {ft+= $2} END {printf("%d"), ut/ft*100}')
+
+# • The current utilization rate of your processors as a percentage.
+cpu_load=$(top -bn1 | grep load | awk '{printf "%.2f%%\n", $(NF-2)}')
+
+# • The date and time of the last reboot.
+last_boot=$(who -b | awk '$1 == "system" {print $3 " " $4}')
+
+# • Whether LVM is active or not.
+lvm_partitions=$(lsblk | grep -c "lvm")
+lvm_is_used=$(if [ $lvm_partitions -eq 0 ]; then echo no; else echo yes; fi)
+
+# • The number of active connections.
+# [$ sudo apt-get install net-tools]
+tcp_connections=$(cat /proc/net/sockstat{,6} | awk '$1 == "TCP:" {print $3}')
+
+# • The number of users using the server.
+users_logged_in=$(w -h | wc -l)
+
+# • The IPv4 address of your server and its MAC (Media Access Control) address.
+ipv4_address=$(hostname -I)
+mac_address=$(ip link show | awk '$1 == "link/ether" {print $2}')
+
+# • The number of commands executed with the sudo program.
+sudo_commands_count=$(journalctl _COMM=sudo | grep -c COMMAND) 
+
+wall "  
+	#Architecture: $architecture
+	#CPU physical: $physical_cpu
+	#vCPU: $virtual_cpu
+	#Memory Usage: $memory_usage
+	#Disk Usage: $used_disk/${total_disk}Gb ($percent_used_disk%)
+	#CPU load: $cpu_load
+	#Last boot: $last_boot
+	#LVM use: $lvm_is_used
+	#Connexions TCP: $tcp_connections ESTABLISHED
+	#User log: $users_logged_in
+	#Network: IP $ipv4_address($mac_address)
+	#Sudo: $sudo_commands_count cmd"
+```
+
+* Check that the schedule job is done `sudo crontab -u root -l`
 
 # 9 Bonus part
 
 
 # Resources
 * [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)
-* [Oracle VM VirtualBox: Networking options and how-to manage them]
-(https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)
+* https://github.com/alineayumi/ft_born2beroot
+* [Oracle VM VirtualBox: Networking options and how-to manage them](https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)

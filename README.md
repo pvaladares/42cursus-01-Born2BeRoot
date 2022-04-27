@@ -212,7 +212,14 @@ sudo passwd
 * Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
 * On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` to end the connection
  
+## 3.5 UFW
 
+> You have to configure your operating system with the UFW firewall and thus leave only port 4242 open.
+> 
+> Your firewall must be active when you launch your virtual machine.
+* Use command `apt install ufw` to install the firewall package and `ufw status` to check status (it should say "inactive").
+* Type `ufw enable` so the *Firewall is active and enabled on system startup*
+* Type `ufw allow 4242` and then `ufw status numbered`, only the port 4242 should appear on the list
 
 
 # 9 Bonus part

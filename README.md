@@ -241,47 +241,47 @@ sudo passwd
 #!/bin/bash
 
 # • The architecture of your operating system and its kernel version.
-architecture=$(uname -a)
+architecture=$(uname --all)
 
 # • The number of physical processors.
-physical_cpu=$(grep "physical id" /proc/cpuinfo | sort | uniq | wc -l)
+physical_cpu=$(grep "physical id" /proc/cpuinfo | sort | uniq | wc --lines)
 
 # • The number of virtual processors.
-virtual_cpu=$(grep -c ^processor /proc/cpuinfo)
+virtual_cpu=$(grep --count "^processor" /proc/cpuinfo)
 
 # • The current available RAM on your server and its utilization rate as a percentage.
-memory_usage=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
+memory_usage=$(free --mebi | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
 
 # • The current available memory on your server and its utilization rate as a percentage.
-total_disk=$(df -Bg | grep '^/dev/' | grep -v '/boot$' | awk '{ft += $2} END {print ft}')
-used_disk=$(df -Bm | grep '^/dev/' | grep -v '/boot$' | awk '{ut += $3} END {print ut}')
-percent_used_disk=$(df -Bm | grep '^/dev/' | grep -v '/boot$' | awk '{ut += $3} {ft+= $2} END {printf("%d"), ut/ft*100}')
+total_disk=$(df --block-size=G | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ft += $2} END {print ft}")
+used_disk=$(df --block-size=M | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ut += $3} END {print ut}")
+percent_used_disk=$(df --block-size=M | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ut += $3} {ft+= $2} END {printf("%d"), ut/ft*100}")
 
 # • The current utilization rate of your processors as a percentage.
-cpu_load=$(top -bn1 | grep load | awk '{printf "%.2f%%\n", $(NF-2)}')
+cpu_load=$(top -bn1 | grep load | awk "{printf "%.2f%%\n", $(NF-2)}")
 
 # • The date and time of the last reboot.
-last_boot=$(who -b | awk '$1 == "system" {print $3 " " $4}')
+last_boot=$(who --boot | awk '$1 == "system" {print $3 " " $4}')
 
 # • Whether LVM is active or not.
-lvm_partitions=$(lsblk | grep -c "lvm")
+lvm_partitions=$(lsblk | grep --count "lvm")
 lvm_is_used=$(if [ $lvm_partitions -eq 0 ]; then echo no; else echo yes; fi)
 
 # • The number of active connections.
-# [$ sudo apt-get install net-tools]
+# [$ sudo apt install net-tools]
 tcp_connections=$(cat /proc/net/sockstat{,6} | awk '$1 == "TCP:" {print $3}')
 
 # • The number of users using the server.
-users_logged_in=$(w -h | wc -l)
+users_logged_in=$(w --no-header | wc --lines)
 
 # • The IPv4 address of your server and its MAC (Media Access Control) address.
-ipv4_address=$(hostname -I)
+ipv4_address=$(hostname --all-ip-addresses)
 mac_address=$(ip link show | awk '$1 == "link/ether" {print $2}')
 
 # • The number of commands executed with the sudo program.
-sudo_commands_count=$(journalctl _COMM=sudo | grep -c COMMAND) 
+sudo_commands_count=$(journalctl _COMM=sudo | grep --count COMMAND) 
 
-wall "  
+wall "
 	#Architecture: $architecture
 	#CPU physical: $physical_cpu
 	#vCPU: $virtual_cpu

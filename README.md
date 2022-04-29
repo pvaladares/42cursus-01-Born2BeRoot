@@ -232,61 +232,77 @@ sudo passwd
 ## 3.6 `cron`
 
 > At server startup, the script will display some information (listed below) on all terminals every 10 minutes (take a look at wall). The banner is optional. No error must be visible.
-* Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * /home/monitoring.sh`
+* Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * bash /home/monitoring.sh`
 > Finally, you have to create a simple script called monitoring.sh. It must be developed in bash.
 
 * Create the script below and use `sudo chmod +x /home/monitoring.sh`
 
 ```bash
 #!/bin/bash
-
+#
 # • The architecture of your operating system and its kernel version.
+# Altough only operating system and kernel version are mentioned, the screenshot of the wall output shows all the information printed by uname
+#   uname - print system information
 architecture=$(uname --all)
-
+#
 # • The number of physical processors.
-physical_cpu=$(grep "physical id" /proc/cpuinfo | sort | uniq | wc --lines)
-
+# Count the number of unique core ids to get the number of physical cores on a machine
+# https://www.baeldung.com/linux/get-number-of-processors
+#   grep - print lines that match patterns
+#   sort - sort lines of text files
+#   wc - print newline, word, and byte counts for each file
+physical_cpu=$(grep "^physical id" /proc/cpuinfo | sort --unique | wc --lines)
+#
 # • The number of virtual processors.
+# Count the exact number of virtual cpu (vCPU)
+# https://webhostinggeeks.com/howto/how-to-display-the-number-of-processors-vcpu-on-linux-vps/
 virtual_cpu=$(grep --count "^processor" /proc/cpuinfo)
-
+#
 # • The current available RAM on your server and its utilization rate as a percentage.
-memory_usage=$(free --mebi | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
-
+# Get information about memory in MB units (refer to the wall output) for Memory (RAM) only
+#   free - Display amount of free and used memory in the system
+#   awk - pattern scanning and text processing language
+#   printf - format and print data
+memory_usage=$(free --mega | awk '$1 == "Mem:" {printf "%s/%sMB (%.2f%%)\n", $3, $2, $3*100/$2}')
+#
 # • The current available memory on your server and its utilization rate as a percentage.
-total_disk=$(df --block-size=G | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ft += $2} END {print ft}")
-used_disk=$(df --block-size=M | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ut += $3} END {print ut}")
+# Compute total disk in GiB (G) units and total used disk in MiB (M) units (refer to the wall output)
+# 
+#   df - report file system disk space usage
+total_disk_GiB=$(df --block-size=G | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ft += $2} END {print ft}")
+used_disk_MiB=$(df --block-size=M | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ut += $3} END {print ut}")
 percent_used_disk=$(df --block-size=M | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ut += $3} {ft+= $2} END {printf("%d"), ut/ft*100}")
-
+#
 # • The current utilization rate of your processors as a percentage.
 cpu_load=$(top -bn1 | grep load | awk "{printf "%.2f%%\n", $(NF-2)}")
-
+#
 # • The date and time of the last reboot.
 last_boot=$(who --boot | awk '$1 == "system" {print $3 " " $4}')
-
+#
 # • Whether LVM is active or not.
 lvm_partitions=$(lsblk | grep --count "lvm")
 lvm_is_used=$(if [ $lvm_partitions -eq 0 ]; then echo no; else echo yes; fi)
-
+#
 # • The number of active connections.
 # [$ sudo apt install net-tools]
 tcp_connections=$(cat /proc/net/sockstat{,6} | awk '$1 == "TCP:" {print $3}')
-
+#
 # • The number of users using the server.
 users_logged_in=$(w --no-header | wc --lines)
-
+#
 # • The IPv4 address of your server and its MAC (Media Access Control) address.
 ipv4_address=$(hostname --all-ip-addresses)
 mac_address=$(ip link show | awk '$1 == "link/ether" {print $2}')
-
+#
 # • The number of commands executed with the sudo program.
-sudo_commands_count=$(journalctl _COMM=sudo | grep --count COMMAND) 
-
+sudo_commands_count=$(journalctl _COMM=sudo | grep --count COMMAND)
+#
 wall "
 	#Architecture: $architecture
 	#CPU physical: $physical_cpu
 	#vCPU: $virtual_cpu
 	#Memory Usage: $memory_usage
-	#Disk Usage: $used_disk/${total_disk}Gb ($percent_used_disk%)
+	#Disk Usage: $used_disk_MiB/${total_disk_GiB}Gb ($percent_used_disk%)
 	#CPU load: $cpu_load
 	#Last boot: $last_boot
 	#LVM use: $lvm_is_used
@@ -302,6 +318,8 @@ wall "
 
 
 # Resources
+* https://www.baeldung.com/linux/get-number-of-processors
+* https://crontab.guru/#*/10_*_*_*_*
 * [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)
 * https://github.com/alineayumi/ft_born2beroot
 * [Oracle VM VirtualBox: Networking options and how-to manage them](https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)

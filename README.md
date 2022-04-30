@@ -267,34 +267,41 @@ memory_usage=$(free --mega | awk '$1 == "Mem:" {printf "%s/%sMB (%.2f%%)\n", $3,
 #
 # • The current available memory on your server and its utilization rate as a percentage.
 # Compute total disk in GiB (G) units and total used disk in MiB (M) units (refer to the wall output)
-# 
 #   df - report file system disk space usage
-total_disk_GiB=$(df --block-size=G | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ft += $2} END {print ft}")
-used_disk_MiB=$(df --block-size=M | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ut += $3} END {print ut}")
-percent_used_disk=$(df --block-size=M | grep "^/dev/" | grep --invert-match "/boot$" | awk "{ut += $3} {ft+= $2} END {printf("%d"), ut/ft*100}")
+disk_usage=$(df --block-size=M --total | awk '$1 == "total" {printf "%d/%dGb (%s)\n", $3, $2/1000, $5}')
 #
 # • The current utilization rate of your processors as a percentage.
-cpu_load=$(top -bn1 | grep load | awk "{printf "%.2f%%\n", $(NF-2)}")
+#   top - display Linux processes #################### CHECK!!!
+cpu_load=$(top -bn1 | grep load | awk '{printf "%.2f%%\n", $(NF-2)}')
 #
 # • The date and time of the last reboot.
+#   who - show who is logged on
 last_boot=$(who --boot | awk '$1 == "system" {print $3 " " $4}')
 #
 # • Whether LVM is active or not.
-lvm_partitions=$(lsblk | grep --count "lvm")
+# Checks if the type of devices includes at least one "lvm" type
+#   lsblk - list block devices
+lvm_partitions=$(lsblk | awk '$(NF-1) == "lvm" | wc --lines)')
 lvm_is_used=$(if [ $lvm_partitions -eq 0 ]; then echo no; else echo yes; fi)
 #
 # • The number of active connections.
+# Check the content of files sockstat...sockstat6
 # [$ sudo apt install net-tools]
 tcp_connections=$(cat /proc/net/sockstat{,6} | awk '$1 == "TCP:" {print $3}')
 #
 # • The number of users using the server.
+# Get the number of user by removing the header and count each line equal one user
+#   w - Show who is logged on and what they are doing
 users_logged_in=$(w --no-header | wc --lines)
 #
 # • The IPv4 address of your server and its MAC (Media Access Control) address.
+#   hostname - show or set the system's host name
+#   ip - show / manipulate routing, network devices, interfaces and tunnels
 ipv4_address=$(hostname --all-ip-addresses)
 mac_address=$(ip link show | awk '$1 == "link/ether" {print $2}')
 #
 # • The number of commands executed with the sudo program.
+#   journalctl - Query the systemd journal
 sudo_commands_count=$(journalctl _COMM=sudo | grep --count COMMAND)
 #
 wall "
@@ -302,7 +309,7 @@ wall "
 	#CPU physical: $physical_cpu
 	#vCPU: $virtual_cpu
 	#Memory Usage: $memory_usage
-	#Disk Usage: $used_disk_MiB/${total_disk_GiB}Gb ($percent_used_disk%)
+	#Disk Usage: $disk_usage
 	#CPU load: $cpu_load
 	#Last boot: $last_boot
 	#LVM use: $lvm_is_used
@@ -312,7 +319,7 @@ wall "
 	#Sudo: $sudo_commands_count cmd"
 ```
 
-* Check that the schedule job is done `sudo crontab -u root -l`
+* Check that the scheduled job exists `sudo crontab -u root -l`
 
 # 9 Bonus part
 

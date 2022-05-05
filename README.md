@@ -4,9 +4,9 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 # 1 - Virtual Machine (VirtualBox)
 
-1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png). To be noted that at the time of writing the latest version is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privileges to install it nor it is available on the `Managed Software Center` to download/install. So `VirtualBox` is indeed the mandatory software to be used on this project.
+1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png) which is an old version since at the time of writing the latest version is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privileges to install it nor it is available on the `Managed Software Center` to download/install. So `VirtualBox` is indeed the mandatory software to be used on this project.
 
-2 - [Download](https://www.debian.org/download) the latest stable version of Debian and place it on your `goinfre` user folder (since it is less restrictive on size limits).
+2 - [Download](https://www.debian.org/download) the latest stable version of Debian and place it on your `sgoinfre` user folder (since it is less restrictive on size limits).
 
 3 - Step by step instructions to create VM
 * Launch `VirtualBox`
@@ -15,12 +15,14 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 4 - If doing the **bonus**, since there is a limitation with the 5.2.20 version use the workaround described below:
 
-*Note: The 5.2.20 version that can be used at 42 has a [limitation/bug](https://www.virtualbox.org/ticket/18177) with impact on the bonus, since it will not be possible to set a disk with size 30.8G*
-  * Go to terminal, and still at `goinfre` user folder, type `VBoxManage createhd --filename Born2beRoot_DISK_31G54.vdi --size 31540 --format VDI`
+*Note: The 5.2.20 version - the only one that can be used at 42 - has a [limitation/bug](https://www.virtualbox.org/ticket/18177) with impact on the bonus, since it will not be possible to set a disk with size exactly to 30.8G*
+* Option 1 - Attempt to create the size exactly 30.8G as per the subject
+  * Go to terminal, and still at `sgoinfre` user folder, type `VBoxManage createhd --filename Born2beRoot_DISK_31G54.vdi --size 31540 --format VDI`
   * Choose `Use an existing virtual hard disk file` and [select the newly created file](img/VM/5.png)
   * [Go to](img/VM/6.png) `Settings` and `Storage`, under `Storage Devices` choose `Empty` and then click on the "CD/Disk" icon on the right of the `Optical Drive` and select option `Choose Virtual Optical Disk File...`; [Select](img/VM/7.png) the debian ISO file that was privously saved on goinfre
+* Option 2 - Just set a size without decimals like 30G (afterall the important thing is to follow the structure from the subject)
  
- * Now just `Start` the VM to start the installation procedure of Debian.
+5 - Now just `Start` the VM to start the installation procedure of Debian.
 
 # 2 - Debian Installation
 
@@ -39,12 +41,12 @@ This project aims to introduce you to the wonderful world of virtualization.
 > - (...)
 > - Your password must be at least 10 characters long. It must contain an uppercase letter and a number. Also, it must not contain more than 3 consecutive identical characters.
 > - The password must not include the name of the user.
-* Root password: *see rules above* (use a strong password generator like [here](https://passwordsgenerator.net/))
+* Root password: *see rules above (e.g.: dcOivR999D, use a strong password generator like [here](https://passwordsgenerator.net/))*
 > In addition to the root user, a user with your login as username has to be present.
 * User account:
   * [Full name](img/Install/8.png): `Pedro Valadares`
   * [Username](img/Install/9.png): `pvaladar`
- * Password: *see rules above*
+ * Password: *see rules above (e.g.: zipNNxuk1p)*
 * [Timezone](img/Install/10.png): `Lisbon`
 
 ## 2.2 - Disk partition (with bonus)
@@ -85,9 +87,10 @@ This project aims to introduce you to the wonderful world of virtualization.
 >
 > - This user has to belong to the `user42` and `sudo` groups.
 
-* Add the user to sudo `sudo adduser pvaladar sudo`
+* Add the user to sudo `adduser pvaladar sudo`
+* Reboot with `reboot` and then login again after `sudo -v` to force cached credentials (will confirm that sudo is working)
 * Create the group `sudo addgroup user42`
-* Add the user to user42 `sudo adduser pvaladar user42`
+* Add the user to the group `adduser pvaladar user42`
 * Verify if the user is correctly added to the groups: `getent group sudo` and `getent group user42`
 *Note: Another way would be to use the following command: `usermod -aG sudo pvaladar`*
 
@@ -117,6 +120,12 @@ Notice that on line 296 it is mentioned that another file needs to be edited on 
 #
 ###############
 ```
+
+For existing users like `root` and `pvaladar` it is required to manually update them:
+* `chage root --maxdays 30 --mindays 2 --warndays 7` # for root
+* `chage -l root` # confirm everything is ok
+* `chage pvaladar -M 30 -m 2 -W 7` # for user
+* `chage -l pvaladar` # confirm everything is ok
 
 ### 3.3.2 - [pam_pwquality - PAM module to perform password quality checking](https://manpages.debian.org/jessie/libpam-pwquality/pam_pwquality.8.en.html)
 
@@ -188,18 +197,18 @@ Just need to create the folder to store the logs
 mkdir /var/log/sudo
 ```
 
-Make finals tests by changing the previously passwords set for username and root:
+Make final arrangements by changing the previously passwords set for username and root accordingy to the new policy set (if you followed my instructions, the password should be already aligned with the strong password policy):
 
 ```bash
-passwd
-sudo passwd
+passwd # to change user password
+sudo passwd # to change root password
 ```
 
 ## 3.4 `ssh`
 
 ### 3.4.1 - Installation
 * Access super user privileges by typing `su --login` and entering the previously set password
-* Install SSH by typing `apt install openssh-server`
+* Install SSH by typing `apt install openssh-server` (this installs both server and client)
 * Make the following checks around openssh-server:
   * It is installed: `dpkg -l | grep ssh`
   * It is active (running): `systemctl status ssh`
@@ -218,7 +227,7 @@ sudo passwd
 ### Connection from terminal
 
 * Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
-* On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` to end the connection
+* On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` or `logout` to end the connection
  
 ## 3.5 `ufw`
 
@@ -326,7 +335,10 @@ wall "
 
 # Resources
 * https://www.baeldung.com/linux/get-number-of-processors
+* https://github.com/ZakariaMahmoud/Born2beRoot_101
 * https://crontab.guru/#*/10_*_*_*_*
 * [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)
+* https://github.com/HEADLIGHTER/Born2BeRoot-42/blob/main/evalknwoledge.txt
+* https://baigal.medium.com/born2beroot-e6e26dfb50ac
 * https://github.com/alineayumi/ft_born2beroot
 * [Oracle VM VirtualBox: Networking options and how-to manage them](https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)

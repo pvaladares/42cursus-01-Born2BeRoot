@@ -92,6 +92,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 * Create the group `sudo addgroup user42`
 * Add the user to the group `adduser pvaladar user42`
 * Verify if the user is correctly added to the groups: `getent group sudo` and `getent group user42`
+
 *Note: Another way would be to use the following command: `usermod -aG sudo pvaladar`*
 
 ## 3.3 - Setting up a strong password policy
@@ -240,7 +241,10 @@ sudo passwd # to change root password
 
 ## 3.6 `cron`
 
-> At server startup, the script will display some information (listed below) on all terminals every 10 minutes (take a look at wall). The banner is optional. No error must be visible.
+> At server startup, the script will display some information (listed below) on all terminals every 10 minutes (take a look at wall). 
+> The banner is optional.
+* Broadcast banner can be hidden using the switch `wall --nobanner`
+> No error must be visible.
 * Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * bash /home/monitoring.sh`
 > Finally, you have to create a simple script called monitoring.sh. It must be developed in bash.
 
@@ -280,7 +284,8 @@ memory_usage=$(free --mega | awk '$1 == "Mem:" {printf "%s/%sMB (%.2f%%)\n", $3,
 disk_usage=$(df --block-size=M --total | awk '$1 == "total" {printf "%d/%dGb (%s)\n", $3, $2/1000, $5}')
 #
 # • The current utilization rate of your processors as a percentage.
-#   top - display Linux processes #################### CHECK!!!
+# https://www.tecmint.com/understand-linux-load-averages-and-monitor-performance/
+#   top - display Linux processes
 cpu_load=$(top -bn1 | grep load | awk '{printf "%.2f%%\n", $(NF-2)}')
 #
 # • The date and time of the last reboot.
@@ -289,10 +294,11 @@ last_boot=$(who --boot | awk '$1 == "system" {print $3 " " $4}')
 #
 # • Whether LVM is active or not.
 # Checks if the type of devices includes at least one "lvm" type
+# https://ryanstutorials.net/bash-scripting-tutorial/bash-if-statements.php
 #   lsblk - list block devices
-lvm_partitions=$(lsblk | awk '$(NF-1) == "lvm" | wc --lines)')
+lvm_partitions=$(lsblk | awk '$(NF-1) == "lvm"' | wc --lines)
 lvm_is_used=$(if [ $lvm_partitions -eq 0 ]; then echo no; else echo yes; fi)
-#
+
 # • The number of active connections.
 # Check the content of files sockstat...sockstat6
 # [$ sudo apt install net-tools]
@@ -313,6 +319,7 @@ mac_address=$(ip link show | awk '$1 == "link/ether" {print $2}')
 #   journalctl - Query the systemd journal
 sudo_commands_count=$(journalctl _COMM=sudo | grep --count COMMAND)
 #
+#   wall - write a message to all users
 wall "
 	#Architecture: $architecture
 	#CPU physical: $physical_cpu
@@ -325,8 +332,11 @@ wall "
 	#Connexions TCP: $tcp_connections ESTABLISHED
 	#User log: $users_logged_in
 	#Network: IP $ipv4_address($mac_address)
-	#Sudo: $sudo_commands_count cmd"
+	#Sudo: $sudo_commands_count cmd
+"
 ```
+
+> Note: In case the output is totally messed up, make sure the file format is set to unix in the editor. For example, in `VI` or `VIM` use command `:set fileformat=unix`
 
 * Check that the scheduled job exists `sudo crontab -u root -l`
 

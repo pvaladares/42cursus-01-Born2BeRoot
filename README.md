@@ -373,7 +373,52 @@ For the WordPress we will be installing the so called LLMP Stack (Linux Lighttpd
 * Lastetly we need to whitelist incoming port 80 (default port for webservers) with `sudo ufw allow 80` 
 * On `VirtualBox` go to Network/NAT choose Port Forwarding and apply rule 80:80 (Host Port:Guest Port), then go to host browser and navigate to http://127.0.0.1/. At this point you should see the default welcome message instead of a not found webpage or ERR_CONNECTION_REFUSED message.
 
-### 4.1.2 MariaDB
+### 4.1.2 `MariaDB`
+
+*MariaDB Server is one of the most popular open source relational databases. It’s made by the original developers of MySQL and guaranteed to stay open source. It is part of most cloud offerings and the default in most Linux distributions.*
+
+* Install the package by typing the following command `sudo apt install mariadb-server`
+* Check it was installed and is active with both commands `dpkg -l | grep mariadb` and `sudo service status mariadb`
+* Start interactive script to improve default security settings with commmand `sudo mysql_secure_installation`
+	* Enter current password for root (enter for none): *`Enter for none`*
+	* Switch to unix_socket authentication [Y/n]: `n`
+	* Change the root password? [Y/n]: `n`
+	* Remove anonymous users? [Y/n]: `Y`
+	* Disallow root login remotely? [Y/n]: `Y`
+	* Remove test database and access to it? [Y/n]: `Y`
+	* Reload privilege tables now? [Y/n]: `Y`
+* Now let's create the database, type `sudo mariadb` to enter the mysql commands console:
+```bash
+CREATE DATABASE my_db;
+```
+* Create `pvaladar` database user identified by `'IamTHEp4ssword!` password:
+```bash
+CREATE USER pvaladar@localhost IDENTIFIED BY 'IamTHEp4ssword!';
+```
+* Give full privileges on `my_db` to `pvaladar`:
+```bash
+GRANT ALL ON my_db.* TO pvaladar@localhost WITH GRANT OPTION;
+```
+* Changes to take effect without reload/restart MariaDB:
+```bash
+FLUSH PRIVILEGES;
+```
+* Check all users and host name where they are allowed to login:
+```bash
+SELECT host, user FROM mysql.user;
+```
+* Everything should OK now. Type `exit` and log in back to check to which databases the newly created user has access to:
+```bash
+sudo mariadb --user=pvaladar --password # enter user database password when prompted
+```
+* Check that the tables that were created, `my_db` should be listed:
+```bash
+SHOW DATABASES;
+```
+* Type `exit` to return to the shell
+
+### 4.1.3 `PHP`
+
 
 ## 4.2 FTP
 

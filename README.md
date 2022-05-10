@@ -348,11 +348,41 @@ wall "
 * Check that the scheduled job exists `sudo crontab -u root -l`
 * To stop the cron service if annoying, just use `sudo service cron stop`
 
-# 9 Bonus part
+# 4 Bonus part
+
+## 4.1 WordPress website
+
+> Set up a functional WordPress website with the following services: lighttpd, MariaDB, and PHP.
+
+The subject requests WordPress with some services, the [official page states the requirements](https://wordpress.org/support/article/before-you-install/
+): 
+> Requirements on the server side
+> * **PHP** 7.4 or greater
+> * **MySQL** 5.6 or **MariaDB** 10.1 or greater
+
+The [detailed instructions](https://wordpress.org/support/article/how-to-install-wordpress/#detailed-instructions) are also found on the official website.
+
+For the WordPress we will be installing the so called LLMP Stack (Linux Lighttpd MariaDB PHP)
+
+### 4.1.1 `lighttpd`
+
+*lighttpd (pronounced /lighty/) is a secure, fast, compliant, and very flexible web server that has been optimized for high-performance environments. lighttpd uses memory and CPU efficiently and has lower resource use than other popular web servers. Its advanced feature-set (FastCGI, CGI, Auth, Output-Compression, URL-Rewriting and much more) make lighttpd the perfect web server for all systems, small and large.*
+
+* Install `lighttpd` by typing the following command `sudo apt install lighttpd`
+* Check it was installed and is active with both commands `dpkg -l | grep lighttpd` and `sudo service status lighttpd`
+* Lastetly we need to whitelist incoming port 80 (default port for webservers) with `sudo ufw allow 80` 
+* On `VirtualBox` go to Network/NAT choose Port Forwarding and apply rule 80:80 (Host Port:Guest Port), then go to host browser and navigate to http://127.0.0.1/. At this point you should see the default welcome message instead of a not found webpage or ERR_CONNECTION_REFUSED message.
+
+### 4.1.2 MariaDB
+
+## 4.2 FTP
+
+
 
 
 # Resources
 * https://www.baeldung.com/linux/get-number-of-processors
+* https://clemedon.github.io/born2beroot_42/
 * https://github.com/ZakariaMahmoud/Born2beRoot_101
 * https://crontab.guru/#*/10_*_*_*_*
 * [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)

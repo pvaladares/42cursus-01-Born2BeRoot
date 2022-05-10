@@ -391,7 +391,7 @@ For the WordPress we will be installing the so called LLMP Stack (Linux Lighttpd
 ```bash
 CREATE DATABASE my_db;
 ```
-* Create `pvaladar` database user identified by `'IamTHEp4ssword!` password:
+* Create `pvaladar` database user identified by `IamTHEp4ssword!` password:
 ```bash
 CREATE USER pvaladar@localhost IDENTIFIED BY 'IamTHEp4ssword!';
 ```
@@ -417,7 +417,67 @@ SHOW DATABASES;
 ```
 * Type `exit` to return to the shell
 
-### 4.1.3 `PHP`
+### 4.1.3 `php`
+
+* Install the following packages:
+```bash
+sudo apt install php-cgi php-mysql
+```
+
+#### `php-cgi`
+*server-side, HTML-embedded scripting language (CGI binary)
+This package provides the /usr/lib/cgi-bin/php CGI interpreter built for use in Apache 2 with mod_actions, or any other CGI httpd that supports a similar mechanism. Note that MOST users probably want the php7.3-fpm package.*
+
+*The following extensions are built in: Core date filter hash libxml openssl pcntl pcre Reflection session sodium SPL standard zlib.*
+
+*PHP (recursive acronym for PHP: Hypertext Preprocessor) is a widely-used open source general-purpose scripting language that is especially suited for web development and can be embedded into HTML.*
+
+#### `php-mysql`
+*This package provides a MySQL module for PHP.*
+
+*PHP (recursive acronym for PHP: Hypertext Preprocessor) is a widely-used open source general-purpose scripting language that is especially suited for web development and can be embedded into HTML.*
+
+* Check it was installed and is active with command `dpkg -l | grep php`
+
+* The following commands are required to be performed, else 403 Forbidden will be shown when trying to access `localhost/index.php` from browser, as per [this discussion](https://stackoverflow.com/questions/11537888/lighttpd-403-forbidden-for-php-files):
+```bash
+# Enable FastCGI Lighttpd modules
+sudo lighty-enable-mod fastcgi
+sudo lighty-enable-mod fastcgi-php
+# Restart server
+sudo service lighttpd force-reload
+```   
+    
+### 4.1.1 `WordPress`
+
+* Download the latest version using `wget` (if not already, install it by command `sudo apt install wget`):
+```bash
+wget https://wordpress.org/latest.tar.gz
+```
+* Extract the content of compressed file:
+```bash
+tar --extract --gzip --verbose --file=latest.tar.gz
+```
+* Copy the extracted folder (and files) to the relevant path to publish to external view:
+```bash
+sudo cp --recursive wordpress/* /var/www/html
+```
+* Delete the installation packages that are not necessary anymore:
+```bash
+rm -rf latest.tar.gz wordpress/
+```
+* Create configuration file from its sample:
+```bash
+sudo cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+```
+* Edit `wp-config.php` (The base configuration for WordPress) to adjust the database details to match the previously work done with the `MariaDB` configuration.
+```bash
+sudo vi /var/www/html/wp-config.php
+```
+* On line 23, replace `database_name_here` by `my_db`
+* On line 26, replace `username_here` by `pvaladar`
+* On line 29, replace `password_here` by `IamTHEp4ssword!`
+
 
 
 ## 4.2 FTP

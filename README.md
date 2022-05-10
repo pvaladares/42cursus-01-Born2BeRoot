@@ -34,6 +34,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 * [Keyboard](img/Install/5.png): `American English`
 > - The hostname of your virtual machine must be your login ending with 42 (e.g., wil42)
 * [Hostname](img/Install/6.png): `pvaladar42`
+* > Note: Hostname can always be changed later using command `hostnamectl set-hostname <name>`, more info [here](https://www.cyberciti.biz/faq/debian-change-hostname-permanently/)
 * [Domain name](img/Install/7.png): *empty*
 > - You have to implement a strong password policy.
 > 
@@ -238,6 +239,7 @@ sudo passwd # to change root password
 * Use command `apt install ufw` to install the firewall package and `ufw status` to check status (it should say "inactive").
 * Type `ufw enable` so the *Firewall is active and enabled on system startup*
 * Type `ufw allow 4242` and then `ufw status numbered`, only the port 4242 should appear on the list
+* `ufw status` and `systemctl status ufw` should show now it as "active"
 
 ## 3.6 `cron`
 
@@ -245,7 +247,12 @@ sudo passwd # to change root password
 > The banner is optional.
 * Broadcast banner can be hidden using the switch `wall --nobanner`
 > No error must be visible.
-* Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * bash /home/monitoring.sh`
+* Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * bash /home/monitoring.sh` (more info about `crontab` [here](https://crontab.guru/#*/10__**))
+> Note: for time less than 1 minute, let's say 30s, it would be required a [workaround using `sleep`](https://stackoverflow.com/questions/9619362/running-a-cron-every-30-seconds):
+```bash
+* * * * * bash /home/monitoring.sh
+* * * * * sleep 30s ; bash /home/monitoring.sh
+```
 > Finally, you have to create a simple script called monitoring.sh. It must be developed in bash.
 
 * Create the script below and use `sudo chmod +x /home/monitoring.sh`
@@ -339,6 +346,7 @@ wall "
 > Note: In case the output is totally messed up, make sure the file format is set to unix in the editor. For example, in `VI` or `VIM` use command `:set fileformat=unix`
 
 * Check that the scheduled job exists `sudo crontab -u root -l`
+* To stop the cron service if annoying, just use `sudo service cron stop`
 
 # 9 Bonus part
 

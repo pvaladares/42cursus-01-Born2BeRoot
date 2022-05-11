@@ -368,8 +368,8 @@ For the WordPress we will be installing the so called LLMP Stack (Linux Lighttpd
 *lighttpd (pronounced /lighty/) is a secure, fast, compliant, and very flexible web server that has been optimized for high-performance environments. lighttpd uses memory and CPU efficiently and has lower resource use than other popular web servers. Its advanced feature-set (FastCGI, CGI, Auth, Output-Compression, URL-Rewriting and much more) make lighttpd the perfect web server for all systems, small and large.*
 
 * Install `lighttpd` by typing the following command `sudo apt install lighttpd`
-* Check it was installed and is active with both commands `dpkg -l | grep lighttpd` and `sudo service status lighttpd`
-* Lastetly we need to whitelist incoming port 80 (default port for webservers) with `sudo ufw allow 80` 
+* Check it was installed and is active with both commands `dpkg -l | grep lighttpd` and `sudo service lighttpd status`
+* Lastetly we need to whitelist incoming port 80 (default port for webservers) with `sudo ufw allow 80/tcp` 
 * On `VirtualBox` go to Network/NAT choose Port Forwarding and apply rule 80:80 (Host Port:Guest Port), then go to host browser and navigate to http://127.0.0.1/. At this point you should see the default welcome message instead of a not found webpage or ERR_CONNECTION_REFUSED message.
 
 ### 4.1.2 `MariaDB`
@@ -396,7 +396,7 @@ CREATE USER pvaladar@localhost IDENTIFIED BY 'IamTHEp4ssword!';
 ```
 * Give full privileges on `my_db` to `pvaladar`:
 ```bash
-GRANT ALL ON my_db.* TO pvaladar@localhost WITH GRANT OPTION;
+GRANT ALL ON my_db.* TO 'pvaladar'@'localhost' IDENTIFIED BY 'IamTHEp4ssword!' WITH GRANT OPTION;
 ```
 * Changes to take effect without reload/restart MariaDB:
 ```bash
@@ -408,7 +408,7 @@ SELECT host, user FROM mysql.user;
 ```
 * Everything should OK now. Type `exit` and log in back to check to which databases the newly created user has access to:
 ```bash
-sudo mariadb --user=pvaladar --password # enter user database password when prompted
+sudo mariadb --user=pvaladar --password=IamTHEp4ssword!
 ```
 * Check that the tables that were created, `my_db` should be listed:
 ```bash
@@ -423,7 +423,8 @@ SHOW DATABASES;
 sudo apt install php-cgi php-mysql
 ```
 
-#### `php-cgi`
+* `php-cgi`
+
 *server-side, HTML-embedded scripting language (CGI binary)
 This package provides the /usr/lib/cgi-bin/php CGI interpreter built for use in Apache 2 with mod_actions, or any other CGI httpd that supports a similar mechanism. Note that MOST users probably want the php7.3-fpm package.*
 
@@ -431,7 +432,8 @@ This package provides the /usr/lib/cgi-bin/php CGI interpreter built for use in 
 
 *PHP (recursive acronym for PHP: Hypertext Preprocessor) is a widely-used open source general-purpose scripting language that is especially suited for web development and can be embedded into HTML.*
 
-#### `php-mysql`
+* `php-mysql`
+
 *This package provides a MySQL module for PHP.*
 
 *PHP (recursive acronym for PHP: Hypertext Preprocessor) is a widely-used open source general-purpose scripting language that is especially suited for web development and can be embedded into HTML.*
@@ -447,7 +449,7 @@ sudo lighty-enable-mod fastcgi-php
 sudo service lighttpd force-reload
 ```   
     
-### 4.1.1 `WordPress`
+### 4.1.4 `WordPress`
 
 * Download the latest version using `wget` (if not already, install it by command `sudo apt install wget`):
 ```bash
@@ -477,9 +479,9 @@ sudo vi /var/www/html/wp-config.php
 * On line 26, replace `username_here` by `pvaladar`
 * On line 29, replace `password_here` by `IamTHEp4ssword!`
 
+* Now accessing http://localhost will automatically forward to http://localhost/wp-admin/install.php to start the installation.
 
-
-## 4.2 FTP
+## 4.2 IFPS
 
 
 

@@ -1,7 +1,6 @@
 # 42cursus-01-Born2beroot
 This project aims to introduce you to the wonderful world of virtualization.
 
-
 # 1 - Virtual Machine (VirtualBox)
 
 1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png) which is an old version since at the time of writing the latest version is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privileges to install it nor it is available on the `Managed Software Center` to download/install. So `VirtualBox` is indeed the mandatory software to be used on this project.
@@ -247,15 +246,15 @@ sudo passwd # to change root password
 > The banner is optional.
 * Broadcast banner can be hidden using the switch `wall --nobanner`
 > No error must be visible.
-* Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * bash /home/monitoring.sh` (more info about `crontab` [here](https://crontab.guru/#*/10__**))
+* Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * bash /usr/local/sbin/monitoring.sh` (more info about `crontab` [here](https://crontab.guru/#*/10__**))
 > Note: for time less than 1 minute, let's say 30s, it would be required a [workaround using `sleep`](https://stackoverflow.com/questions/9619362/running-a-cron-every-30-seconds):
 ```bash
-* * * * * bash /home/monitoring.sh
-* * * * * sleep 30s ; bash /home/monitoring.sh
+* * * * * bash /usr/local/sbin/monitoring.sh
+* * * * * sleep 30s ; bash /usr/local/sbin/monitoring.sh
 ```
 > Finally, you have to create a simple script called monitoring.sh. It must be developed in bash.
 
-* Create the script below and use `sudo chmod +x /home/monitoring.sh`
+* Create the script below and use `sudo chmod +x /usr/local/sbin/monitoring.sh`
 
 ```bash
 #!/bin/bash
@@ -378,7 +377,7 @@ For the WordPress we will be installing the so called LLMP Stack (Linux Lighttpd
 *MariaDB Server is one of the most popular open source relational databases. It’s made by the original developers of MySQL and guaranteed to stay open source. It is part of most cloud offerings and the default in most Linux distributions.*
 
 * Install the package by typing the following command `sudo apt install mariadb-server`
-* Check it was installed and is active with both commands `dpkg -l | grep mariadb` and `sudo service status mariadb`
+* Check it was installed and is active with both commands `dpkg -l | grep mariadb` and `sudo service mariadb status`
 * Start interactive script to improve default security settings with commmand `sudo mysql_secure_installation`
 	* Enter current password for root (enter for none): *`Enter for none`*
 	* Switch to unix_socket authentication [Y/n]: `n`
@@ -437,7 +436,7 @@ This package provides the /usr/lib/cgi-bin/php CGI interpreter built for use in 
 
 *PHP (recursive acronym for PHP: Hypertext Preprocessor) is a widely-used open source general-purpose scripting language that is especially suited for web development and can be embedded into HTML.*
 
-* Check it was installed and is active with command `dpkg -l | grep php`
+* Check it was installed with command `dpkg -l | grep php`
 
 * The following commands are required to be performed, else 403 Forbidden will be shown when trying to access `localhost/index.php` from browser, as per [this discussion](https://stackoverflow.com/questions/11537888/lighttpd-403-forbidden-for-php-files):
 ```bash

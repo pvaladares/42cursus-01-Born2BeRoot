@@ -5,7 +5,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 1 - On the 42 machine, launch the [Managed Software Center](img/VM/1.png) app and search/install [VirtualBox 5.2.20](img/VM/2.png) which is an old version since at the time of writing the latest version is 6.1 as can be checked [here](https://www.virtualbox.org/). To be noted that the alternative software `UTM` stated on the subject cannot be used since there are no admin privileges to install it nor it is available on the `Managed Software Center` to download/install. So `VirtualBox` is indeed the mandatory software to be used on this project.
 
-2 - [Download](https://www.debian.org/download) the latest stable version of Debian and place it on your `sgoinfre` user folder (since it is less restrictive on size limits).
+2 - [Download](https://www.debian.org/download) the latest stable version of Debian and place it on your `sgoinfre` user folder (since it is the least restrictive on size limit).
 
 3 - Step by step instructions to create VM
 * Launch `VirtualBox`
@@ -16,7 +16,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 *Note: The 5.2.20 version - the only one that can be used at 42 - has a [limitation/bug](https://www.virtualbox.org/ticket/18177) with impact on the bonus, since it will not be possible to set a disk with size exactly to 30.8G*
 * Option 1 - Attempt to create the size exactly 30.8G as per the subject
-  * Go to terminal, and still at `sgoinfre` user folder, type `VBoxManage createhd --filename Born2beRoot_DISK_31G54.vdi --size 31540 --format VDI`
+  * Go to terminal, and still at `sgoinfre` user folder, use the [`VBoxManage`](https://www.virtualbox.org/manual/ch08.html) command, type `VBoxManage createhd --filename Born2beRoot_DISK_31G54.vdi --size 31540 --format VDI`
   * Choose `Use an existing virtual hard disk file` and [select the newly created file](img/VM/5.png)
   * [Go to](img/VM/6.png) `Settings` and `Storage`, under `Storage Devices` choose `Empty` and then click on the "CD/Disk" icon on the right of the `Optical Drive` and select option `Choose Virtual Optical Disk File...`; [Select](img/VM/7.png) the debian ISO file that was privously saved on goinfre
 * Option 2 - Just set a size without decimals like 30G (afterall the important thing is to follow the structure from the subject)
@@ -69,7 +69,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 
 ## 2.4 - Reboot, unlock the disk, login and check disk partitions
 
-* Now the machine will reboot and the [GRUB boot loader will show the Debian](img/Install/20.png) and load it by default, if nothing is pressed
+* Now the machine will reboot and the [GRUB boot loader will show Debian](img/Install/20.png) and load it by default, if nothing is pressed
 * Type the [unlock disk password](img/Install/21.png), previously set during the installation, to unlock the disk
 * Then type the [username `pvaladar` and the associated password](img/Install/22.png)
 * In order to cross-check the disk partition *versus* the subject (in this case the bonus), use the [`lsblk` utility](img/Install/23.png)
@@ -77,7 +77,7 @@ This project aims to introduce you to the wonderful world of virtualization.
 # 3 - Mandatory part
 
 ## 3.1 - `apt` and `sudo`
-* First procedure would be login as root [`su --login`](https://man7.org/linux/man-pages/man1/su.1.html) and upgdate & upgrade the default package manager APT *(Advanced Packaging Tool)* `apt update && apt upgrade`. For more information install man `apt install man` and read the docs `man apt`
+* First procedure would be to login as root [`su --login`](https://man7.org/linux/man-pages/man1/su.1.html) and upgdate & upgrade the default package manager APT *(Advanced Packaging Tool)* `apt update && apt upgrade`. For more information install man `apt install man` and read the docs `man apt`
 > You have to install and configure sudo following strict rules
 * The second step is to install sudo since there are several requirements with permissions of users/groups, etc. that need to be modified/set: `apt install sudo`
 
@@ -90,10 +90,10 @@ This project aims to introduce you to the wonderful world of virtualization.
 * Add the user to sudo `adduser pvaladar sudo`
 * Reboot with `reboot` and then login again after `sudo -v` to force cached credentials (will confirm that sudo is working)
 * Create the group `sudo addgroup user42`
-* Add the user to the group `adduser pvaladar user42`
+* Add the user to the group `sudo adduser pvaladar user42`
 * Verify if the user is correctly added to the groups: `getent group sudo` and `getent group user42`
 
-*Note: Another way would be to use the following command: `usermod -aG sudo pvaladar`*
+*Note: Another way would be to use the following command: `usermod -aG sudo pvaladar`*, man page [here](https://man7.org/linux/man-pages/man8/usermod.8.html)
 
 ## 3.3 - Setting up a strong password policy
 
@@ -123,10 +123,16 @@ Notice that on line 296 it is mentioned that another file needs to be edited on 
 ```
 
 For existing users like `root` and `pvaladar` it is required to manually update them:
-* `chage root --maxdays 30 --mindays 2 --warndays 7` # for root
-* `chage -l root` # confirm everything is ok
-* `chage pvaladar -M 30 -m 2 -W 7` # for user
-* `chage -l pvaladar` # confirm everything is ok
+```bash
+# Update root
+chage root --maxdays 30 --mindays 2 --warndays 7
+# Confirm that everything is OK with root
+chage -l root
+# Update user
+chage pvaladar -M 30 -m 2 -W 7
+# Confirm that everything is OK with user
+chage -l pvaladar
+```
 
 ### 3.3.2 - [pam_pwquality - PAM module to perform password quality checking](https://manpages.debian.org/jessie/libpam-pwquality/pam_pwquality.8.en.html)
 
@@ -198,6 +204,8 @@ Just need to create the folder to store the logs
 mkdir /var/log/sudo
 ```
 
+> After setting up your configuration files, you will have to change all the passwords of the accounts present on the virtual machine,  including the root account.
+
 Make final arrangements by changing the previously passwords set for username and root accordingy to the new policy set (if you followed my instructions, the password should be already aligned with the strong password policy):
 
 ```bash
@@ -225,7 +233,7 @@ sudo passwd # to change root password
 * Double-check the root permission is correctly configured by using command `cat /etc/ssh/sshd_config | grep PermitRootLogin`
 * Now need to restart the SSH service to replace the new port, type `systemctl restart ssh` and then `systemctl status ssh`, [it should be read something like *Server listening on 0.0.0. port 4242*](img/VM/8.png)
 
-### Connection from terminal
+### 3.4.3 - Connection from terminal
 
 * Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
 * On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` or `logout` to end the connection
@@ -247,7 +255,8 @@ sudo passwd # to change root password
 * Broadcast banner can be hidden using the switch `wall --nobanner`
 > No error must be visible.
 * Use `sudo crontab -u root -e` to edit the scheduled commands and add the line `*/10 * * * * bash /usr/local/sbin/monitoring.sh` (more info about `crontab` [here](https://crontab.guru/#*/10__**))
-> Note: for time less than 1 minute, let's say 30s, it would be required a [workaround using `sleep`](https://stackoverflow.com/questions/9619362/running-a-cron-every-30-seconds):
+
+*Note: for time less than 1 minute, let's say 30s, it would be required a [workaround using `sleep`](https://stackoverflow.com/questions/9619362/running-a-cron-every-30-seconds):*
 ```bash
 * * * * * bash /usr/local/sbin/monitoring.sh
 * * * * * sleep 30s ; bash /usr/local/sbin/monitoring.sh
@@ -345,7 +354,7 @@ wall "
 > Note: In case the output is totally messed up, make sure the file format is set to unix in the editor. For example, in `VI` or `VIM` use command `:set fileformat=unix`
 
 * Check that the scheduled job exists `sudo crontab -u root -l`
-* To stop the cron service if annoying, just use `sudo service cron stop`
+* To stop the cron service if annoying, just use `sudo service cron stop` or `sudo systemctl stop cron`
 
 # 4 Bonus part
 
@@ -361,7 +370,7 @@ The subject requests WordPress with some services, the [official page states the
 
 The [detailed instructions](https://wordpress.org/support/article/how-to-install-wordpress/#detailed-instructions) are also found on the official website.
 
-For the WordPress we will be installing the so called LLMP Stack (Linux Lighttpd MariaDB PHP)
+For the WordPress we will be installing the so called **LLMP Stack (Linux Lighttpd MariaDB PHP)**.
 
 ### 4.1.1 `lighttpd`
 
@@ -406,7 +415,7 @@ FLUSH PRIVILEGES;
 ```bash
 SELECT host, user FROM mysql.user;
 ```
-* Everything should OK now. Type `exit` and log in back to check to which databases the newly created user has access to:
+* Everything should be OK now. Type `exit` and log in back to check to which databases the newly created user has access to:
 ```bash
 sudo mariadb --user=pvaladar --password=IamTHEp4ssword!
 ```
@@ -459,7 +468,7 @@ wget https://wordpress.org/latest.tar.gz
 ```bash
 tar --extract --gzip --verbose --file=latest.tar.gz
 ```
-* Copy the extracted folder (and files) to the relevant path to publish to external view:
+* Copy the extracted files to the relevant path to publish to external view:
 ```bash
 sudo cp --recursive wordpress/* /var/www/html
 ```
@@ -485,12 +494,12 @@ sudo vi /var/www/html/wp-config.php
 
 > * Set up a service of your choice that you think is useful (NGINX / Apache2 excluded!).
 
-Since the mandatory bonus is to install a centralized webserver, it would be interesting to install as last bonus a kind of decentralized storage service version.
+Since the mandatory bonus is to install a webserver, it would be interesting to install as last bonus a kind of peer-to-peer file storage service.
 
 * [`IPFS -- Inter-Planetary File system`](https://github.com/ipfs/go-ipfs/blob/master/assets/init-doc/about)
 
-*IPFS is a global, versioned, peer-to-peer filesystem. It combines good ideas from Git, BitTorrent, Kademlia, SFS, and the Web. It is like a single bit-torrent swarm, exchanging git objects. **IPFS provides an interface as simple
-as the HTTP web, but with permanence built-in.***
+*IPFS is a global, versioned, peer-to-peer filesystem. It combines good ideas from Git, BitTorrent, Kademlia, SFS, and the Web. It is like a single bit-torrent swarm, exchanging git objects. IPFS provides an interface as simple
+as the HTTP web, but with permanence built-in.*
 
 There are several options for installation but for simplicity and since no graphic interface is allowed the command-line version will be used.
 
@@ -512,7 +521,7 @@ sudo bash install.sh
 ipfs --version
 ```
 
-* Open the necessary port on `UFW` as per described [here](https://docs.ipfs.io/how-to/nat-configuration/#port-forwarding):
+* Open the necessary port on `UFW` as described [here](https://docs.ipfs.io/how-to/nat-configuration/#port-forwarding):
 ```bash
 sudo ufw allow 4001/tcp
 sudo ufw status # to check
@@ -553,7 +562,7 @@ ipfs daemon &
 ipfs swarm peers
 ```
 
-* Create a service to make sure IPFS is running all the time with command `sudo vi /etc/systemd/system/ipfs.service` and enter
+* It works! Now just need to create a service to make sure IPFS is running all the time, even after reboot. Use command `sudo vi /etc/systemd/system/ipfs.service` and enter
 ```bash
 [Unit]
 Description=IPFS Daemon
@@ -588,14 +597,69 @@ dpkg -l | grep ngix
 dpkg -l | grep apache
 ```
 
+# 5 - Preparation for Defense
 
-# Resources
-* https://www.baeldung.com/linux/get-number-of-processors
-* https://clemedon.github.io/born2beroot_42/
-* https://github.com/ZakariaMahmoud/Born2beRoot_101
-* https://crontab.guru/#*/10_*_*_*_*
-* [Born2beRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)
-* https://github.com/HEADLIGHTER/Born2BeRoot-42/blob/main/evalknwoledge.txt
-* https://baigal.medium.com/born2beroot-e6e26dfb50ac
-* https://github.com/alineayumi/ft_born2beroot
-* [Oracle VM VirtualBox: Networking options and how-to manage them](https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)
+## 5.1 - Operating System (`Debian`), Package Managers (`aptitude` vs `apt`) and `AppArmor`
+
+> You must choose as an operating system either the latest stable version of Debian (no testing/unstable), or the latest stable version of CentOS. **Debian is highly recommended if you are new to system administration.**
+>
+> Setting up CentOS is quite complex. Therefore, you don’t have to set up KDump. However, SELinux must be running at startup and its configuration has to be adapted for the project’s needs. 
+
+* Explanation about differences between Debian and CentOS [here](https://www.fosslinux.com/49958/debian-vs-centos.htm)
+
+
+> **AppArmor for Debian must be running at startup too.**
+* Check that `AppArmor` is running with command `sudo aa-status`
+
+> **During the defense, you will be asked a few questions about the operating system you chose.** For instance, you should **know the differences between `aptitude` and `apt`**, or what SELinux or **`AppArmor` is**. In short, understand what you use!
+* As noted on subject *Debian is highly recommended if you are new to system administration* and *Setting up CentOS is quite complex.*
+
+* Differences between `aptitude` and `apt` [here](https://www.tecmint.com/difference-between-apt-and-aptitude/). Both are frontends of `dpkg` (package manager for Debian) that has the limitation of not handling dependencies, being `apt` older and with less features than `aptitude` (a fancy interactive manager). More info [here](https://askubuntu.com/questions/309113/what-is-the-difference-between-dpkg-and-aptitude-apt-get), [here](https://en.wikipedia.org/wiki/APT_(software)) and [here](https://en.wikipedia.org/wiki/Aptitude_(software)).
+
+* Explanation about [AppArmor](https://apparmor.net/):
+
+*Linux kernel security module | AppArmor is an effective and easy-to-use Linux application security system. AppArmor proactively protects the operating system and applications from external or internal threats, even zero-day attacks, by enforcing good behavior and preventing both known and unknown application flaws from being exploited.*
+
+ ## 5.2 - `ssh`
+ 
+> For security reasons, it must not be possible to connect using SSH as root.
+> The use of SSH will be tested during the defense by setting up a new account. You must therefore understand how it works.
+* Attempt to login as `root` to see the error message: `ssh root@localhost -p 4242`
+
+## 5.3 - `ufw`
+
+> Your firewall must be active when you launch your virtual machine.
+* After reboot check it is active with `sudo ufw status` and `sudo systemctl status ufw`
+
+## 5.4 - Users and Groups
+
+> During the defense, you will have to create a new user and assign it to a group.
+```bash
+# Create new user
+sudo adduser <username>
+# Add new group
+sudo groupadd <group_name>
+# Add user to a group
+sudo adduser <username> <group_name>
+# Current user
+whoiam
+# See current user groups
+groups
+```
+
+## 5.5. - `cron`
+
+> During the defense, you will be asked to explain how this script works. You will also have to interrupt it without modifying it. Take a look at cron.
+* To interrupt type `sudo systemctl stop cron`. To revert, either type `sudo systemctl start cron` or `sudo reboot`.
+
+# 6 - Resources
+
+* [VirtualBox Manual](https://www.virtualbox.org/manual/)
+* [VirtualBox Networking Reference](https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)
+* [man pages](https://man7.org/linux/man-pages)
+* [crontab guru](https://crontab.guru/)
+* [clemedon Guide](https://clemedon.github.io/born2beroot_42/)
+* [ZakariaMahmoud Guide](https://github.com/ZakariaMahmoud/Born2beRoot_101)
+* [baigal Guide](https://baigal.medium.com/born2beroot-e6e26dfb50ac)
+* [Headlighter Guide](https://github.com/HEADLIGHTER/Born2BeRoot-42)
+* [Born2BeRoot Correction](https://github.com/sltcestloic/born2beroot_correction/blob/master/correction_born2beroot.pdf)

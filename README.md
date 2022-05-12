@@ -483,7 +483,77 @@ sudo vi /var/www/html/wp-config.php
 
 ## 4.2 IFPS
 
+Since the mandatory bonus is to install a centralized webserver (lighttpd), it would be interesting to install as free choice last bonus a kind of decentralized service version.
 
+* `IPFS powers the Distributed Web`
+
+*A peer-to-peer hypermedia protocol designed to preserve and grow humanity's knowledge by making the web upgradeable, resilient, and more open.*
+
+There are several options for installation (desktop, command-line, etc.), for simplicity and since no graphic interface is allowed, the command-line version will be used.
+
+* `Command-line install`
+
+*All IPFS, no frills*
+*Just want to use IPFS from your terminal? Follow these step-by-step instructions for getting up and running on the command line using the Go implementation of IPFS. Includes directions for Windows, macOS, and Linux.*
+
+* Follow the [official instructions for Linux](https://docs.ipfs.io/install/command-line/#linux) and start by installing the pre-requisites
+```bash
+# 1 - Download the Linux binary from dist.ipfs.io (opens new window)
+wget https://dist.ipfs.io/go-ipfs/v0.12.2/go-ipfs_v0.12.2_linux-amd64.tar.gz
+# 2 - Unzip the file
+tar -xvzf go-ipfs_v0.12.2_linux-amd64.tar.gz
+# 3 - Move into the go-ipfs folder and run the install script
+cd go-ipfs
+sudo bash install.sh
+# 4 - Test that IPFS has installed correctly:
+ipfs --version
+```
+
+* Adjust the maximum buffer size (from 300k to to 2500k):
+```bash
+sudo sysctl -w net.core.rmem_max=2500000
+```
+
+* Initialize the daemon [https://docs.ipfs.io/how-to/command-line-quick-start/#initialize-the-repository](https://docs.ipfs.io/how-to/command-line-quick-start/#initialize-the-repository)
+```bash
+ipfs init --profile server
+```
+
+* Adjust the default maximum disk storage for data retrieved from other peer](https://github.com/ipfs/go-ipfs/blob/v0.12.2/docs/config.md#datastorestoragemax)
+```bash
+# Adjust IPFS repo size from default 10GB to 50MB
+ipfs config Datastore.StorageMax 50MB
+```
+
+* Let's try some commands to make sure ipfs works:
+```bash
+# Test that ipfs is working, by requesting and viewing the readme file
+ipfs cat /ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme
+# You can explore other objects in the repository. In particular, the `quick-start` directory which shows example commands to try
+ipfs cat /ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/quick-start
+```
+
+* Launch the daemon online to do some more commands
+```bash
+# Launch deamon
+ipfs daemon &
+# Check peers online
+ipfs swarm peers
+# Download a JPG file to locally
+ipfs cat /ipfs/QmSgvgwxZGaBLqkGyWemEDqikCqU52XxsYLKtdy3vGZ8uq > ./spaceship-launch.jpg
+```
+
+# Missing: external UI and UFW ports
+
+
+
+
+> • Set up a service of your choice that you think is useful (NGINX / Apache2 excluded!).
+As final check, make sure that `nginx` and `apache` are not installed, before making the final hash
+```bash
+dpkg -l | grep ngix
+dpkg -l | grep apache
+```
 
 
 # Resources

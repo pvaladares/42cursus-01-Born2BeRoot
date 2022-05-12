@@ -483,24 +483,27 @@ sudo vi /var/www/html/wp-config.php
 
 ## 4.2 IFPS
 
-Since the mandatory bonus is to install a centralized webserver (lighttpd), it would be interesting to install as free choice last bonus a kind of decentralized service version.
+> * Set up a service of your choice that you think is useful (NGINX / Apache2 excluded!).
 
-* `IPFS powers the Distributed Web`
+Since the mandatory bonus is to install a centralized webserver, it would be interesting to install as last bonus a kind of decentralized storage service version.
 
-*A peer-to-peer hypermedia protocol designed to preserve and grow humanity's knowledge by making the web upgradeable, resilient, and more open.*
+* [`IPFS -- Inter-Planetary File system`](https://github.com/ipfs/go-ipfs/blob/master/assets/init-doc/about)
 
-There are several options for installation (desktop, command-line, etc.), for simplicity and since no graphic interface is allowed, the command-line version will be used.
+*IPFS is a global, versioned, peer-to-peer filesystem. It combines good ideas from Git, BitTorrent, Kademlia, SFS, and the Web. It is like a single bit-torrent swarm, exchanging git objects. **IPFS provides an interface as simple
+as the HTTP web, but with permanence built-in.***
+
+There are several options for installation but for simplicity and since no graphic interface is allowed the command-line version will be used.
 
 * `Command-line install`
 
 *All IPFS, no frills*
 *Just want to use IPFS from your terminal? Follow these step-by-step instructions for getting up and running on the command line using the Go implementation of IPFS. Includes directions for Windows, macOS, and Linux.*
 
-* Follow the [official instructions for Linux](https://docs.ipfs.io/install/command-line/#linux) and start by installing the pre-requisites
+* Follow the [official instructions for Linux](https://docs.ipfs.io/install/command-line/#linux)
 ```bash
 # 1 - Download the Linux binary from dist.ipfs.io (opens new window)
 wget https://dist.ipfs.io/go-ipfs/v0.12.2/go-ipfs_v0.12.2_linux-amd64.tar.gz
-# 2 - Unzip the file
+# 2 - Unzip the file (optional step is to delete then the tar.gz file)
 tar -xvzf go-ipfs_v0.12.2_linux-amd64.tar.gz
 # 3 - Move into the go-ipfs folder and run the install script
 cd go-ipfs
@@ -509,20 +512,27 @@ sudo bash install.sh
 ipfs --version
 ```
 
-* Adjust the maximum buffer size (from 300k to to 2500k):
+* Open the necessary port on `UFW` as per described [here](https://docs.ipfs.io/how-to/nat-configuration/#port-forwarding):
+```bash
+sudo ufw allow 4001/tcp
+sudo ufw status # to check
+```
+* On `VirtualBox` go to Network/NAT choose Port Forwarding and apply rule 4001:4001 (Host Port:Guest Port)
+
+* Adjust the maximum buffer size (from 300k to to 2500k) since when launching the daemon an error message would be shown complaining about the buffer size:
 ```bash
 sudo sysctl -w net.core.rmem_max=2500000
 ```
 
-* Initialize the daemon [https://docs.ipfs.io/how-to/command-line-quick-start/#initialize-the-repository](https://docs.ipfs.io/how-to/command-line-quick-start/#initialize-the-repository)
-```bash
-ipfs init --profile server
-```
-
-* Adjust the default maximum disk storage for data retrieved from other peer](https://github.com/ipfs/go-ipfs/blob/v0.12.2/docs/config.md#datastorestoragemax)
+* Adjust the default [maximum disk storage for data retrieved from other peer](https://github.com/ipfs/go-ipfs/blob/v0.12.2/docs/config.md#datastorestoragemax)
 ```bash
 # Adjust IPFS repo size from default 10GB to 50MB
 ipfs config Datastore.StorageMax 50MB
+```
+
+* [Initialize the daemon](https://docs.ipfs.io/how-to/command-line-quick-start/#initialize-the-repository)
+```bash
+ipfs init --profile server
 ```
 
 * Let's try some commands to make sure ipfs works:
@@ -531,25 +541,48 @@ ipfs config Datastore.StorageMax 50MB
 ipfs cat /ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme
 # You can explore other objects in the repository. In particular, the `quick-start` directory which shows example commands to try
 ipfs cat /ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/quick-start
-```
-
-* Launch the daemon online to do some more commands
-```bash
-# Launch deamon
-ipfs daemon &
-# Check peers online
-ipfs swarm peers
 # Download a JPG file to locally
 ipfs cat /ipfs/QmSgvgwxZGaBLqkGyWemEDqikCqU52XxsYLKtdy3vGZ8uq > ./spaceship-launch.jpg
 ```
 
-# Missing: external UI and UFW ports
+* Launch the daemon online to do some more commands
+```bash
+# Launch deamon, take note of the PID, to shutdown the service use `kill <PID>`
+ipfs daemon &
+# Check peers online
+ipfs swarm peers
+```
 
+* Create a service to make sure IPFS is running all the time with command `sudo vi /etc/systemd/system/ipfs.service` and enter
+```bash
+[Unit]
+Description=IPFS Daemon
+[Service]
+Type=simple
+ExecStart=ipfs daemon --enable-gc
+Group=pvaladar
+Restart=always
+Environment="IPFS_PATH=/home/pvaladar/.ipfs"
+[Install]
+WantedBy=multi-user.target
+```
 
+* Start and enable IPFS service:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable ipfs
+sudo systemctl start ipfs
+```
 
+* Check that IPFS is active and enabled:
+```bash
+sudo systemctl status ipfs
+```
+
+## 4.3 Final checks
 
 > • Set up a service of your choice that you think is useful (NGINX / Apache2 excluded!).
-As final check, make sure that `nginx` and `apache` are not installed, before making the final hash
+As final check, make sure that `nginx` and `apache` are not installed before making the final hash
 ```bash
 dpkg -l | grep ngix
 dpkg -l | grep apache

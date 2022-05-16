@@ -235,8 +235,9 @@ sudo passwd # to change root password
 
 ### 3.4.3 - Connection from terminal
 
-* Under [VirtualBox/Network/NAT](img/VM/9.png) choose Port Forwarding and [apply rule 4242:4242 (Host Port:Guest Port)](img/VM/10.png)
-* On terminal type `ssh pvaladar@localhost -p 4242` and enter the associated password. When ready type `exit` or `logout` to end the connection
+* On server machine type `ip addr` to know the <ip address>.
+* Under `VirtualBox/Network` choose [`Bridged Adapter`](img/VM/9.png)
+* On terminal type `ssh pvaladar@<ip address> -p 4242` and enter the associated password. When ready type `exit` or `logout` to end the connection
  
 ## 3.5 `ufw`
 
@@ -379,7 +380,7 @@ For the WordPress we will be installing the so called **LLMP Stack (Linux Lightt
 * Install `lighttpd` by typing the following command `sudo apt install lighttpd`
 * Check it was installed and is active with both commands `dpkg -l | grep lighttpd` and `sudo service lighttpd status`
 * Lastetly we need to whitelist incoming port 80 (default port for webservers) with `sudo ufw allow 80/tcp` 
-* On `VirtualBox` go to Network/NAT choose Port Forwarding and apply rule 80:80 (Host Port:Guest Port), then go to host browser and navigate to http://127.0.0.1/. At this point you should see the default welcome message instead of a not found webpage or ERR_CONNECTION_REFUSED message.
+* Go to host browser and navigate to http://127.0.0.1/. At this point you should see the default welcome message instead of a not found webpage or ERR_CONNECTION_REFUSED message.
 
 ### 4.1.2 `MariaDB`
 
@@ -449,7 +450,7 @@ This package provides the /usr/lib/cgi-bin/php CGI interpreter built for use in 
 
 * Check it was installed with command `dpkg -l | grep php`
 
-* The following commands are required to be performed, else 403 Forbidden will be shown when trying to access `localhost/index.php` from browser, as per [this discussion](https://stackoverflow.com/questions/11537888/lighttpd-403-forbidden-for-php-files):
+* The following commands are required to be performed, else 403 Forbidden will be shown when trying to access `<ip address>/index.php` from browser, as per [this discussion](https://stackoverflow.com/questions/11537888/lighttpd-403-forbidden-for-php-files):
 ```bash
 # Enable FastCGI Lighttpd modules
 sudo lighty-enable-mod fastcgi
@@ -488,7 +489,7 @@ sudo vi /var/www/html/wp-config.php
 * On line 26, replace `username_here` by `pvaladar`
 * On line 29, replace `password_here` by `IamTHEp4ssword!`
 
-* Now accessing http://localhost will automatically forward to http://localhost/wp-admin/install.php to start the installation.
+* Now accessing http://<ip address> will automatically forward to http://<ip address>/wp-admin/install.php to start the installation.
 
 ## 4.2 IFPS
 
@@ -526,7 +527,6 @@ ipfs --version
 sudo ufw allow 4001/tcp
 sudo ufw status # to check
 ```
-* On `VirtualBox` go to Network/NAT choose Port Forwarding and apply rule 4001:4001 (Host Port:Guest Port)
 
 * Adjust the maximum buffer size (from 300k to to 2500k) since when launching the daemon an error message would be shown complaining about the buffer size:
 ```bash
@@ -624,7 +624,8 @@ dpkg -l | grep apache
  
 > For security reasons, it must not be possible to connect using SSH as root.
 > The use of SSH will be tested during the defense by setting up a new account. You must therefore understand how it works.
-* Attempt to login as `root` to see the error message: `ssh root@localhost -p 4242`
+* On server machine type `ip addr` to know the <ip address>.
+* Attempt to login as `root` to see the error message: `ssh root@<ip address> -p 4242`
 
 ## 5.3 - `ufw`
 

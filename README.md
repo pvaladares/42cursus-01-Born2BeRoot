@@ -648,7 +648,7 @@ whoiam
 groups
 ```
 
-## 5.5. - `cron`
+## 5.5 - `cron`
 
 > During the defense, you will be asked to explain how this script works. You will also have to interrupt it without modifying it. Take a look at cron.
 * To interrupt type `sudo systemctl stop cron`. To revert, either type `sudo systemctl start cron` or `sudo reboot`.
@@ -659,6 +659,7 @@ groups
 * [VirtualBox Networking Reference](https://blogs.oracle.com/scoter/post/oracle-vm-virtualbox-networking-options-and-how-to-manage-them)
 * [man pages](https://man7.org/linux/man-pages)
 * [crontab guru](https://crontab.guru/)
+* [RamonLucio Guide](https://github.com/RamonLucio/Born2beRoot)
 * [clemedon Guide](https://clemedon.github.io/born2beroot_42/)
 * [ZakariaMahmoud Guide](https://github.com/ZakariaMahmoud/Born2beRoot_101)
 * [baigal Guide](https://baigal.medium.com/born2beroot-e6e26dfb50ac)

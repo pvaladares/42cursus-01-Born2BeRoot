@@ -491,7 +491,7 @@ sudo vi /var/www/html/wp-config.php
 
 * Now accessing http://<ip address> will automatically forward to http://<ip address>/wp-admin/install.php to start the installation.
 
-## 4.2 IFPS
+## 4.2 IPFS
 
 > * Set up a service of your choice that you think is useful (NGINX / Apache2 excluded!).
 

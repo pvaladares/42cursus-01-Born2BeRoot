@@ -380,7 +380,7 @@ For the WordPress we will be installing the so called **LLMP Stack (Linux Lightt
 * Install `lighttpd` by typing the following command `sudo apt install lighttpd`
 * Check it was installed and is active with both commands `dpkg -l | grep lighttpd` and `sudo service lighttpd status`
 * Lastetly we need to whitelist incoming port 80 (default port for webservers) with `sudo ufw allow 80/tcp` 
-* Go to host browser and navigate to http://127.0.0.1/. At this point you should see the default welcome message instead of a not found webpage or ERR_CONNECTION_REFUSED message.
+* Go to host browser and navigate to `http://<ip address>`. At this point you should see the default welcome message instead of a not found webpage or ERR_CONNECTION_REFUSED message.
 
 ### 4.1.2 `MariaDB`
 
@@ -489,7 +489,7 @@ sudo vi /var/www/html/wp-config.php
 * On line 26, replace `username_here` by `pvaladar`
 * On line 29, replace `password_here` by `IamTHEp4ssword!`
 
-* Now accessing http://<ip address> will automatically forward to http://<ip address>/wp-admin/install.php to start the installation.
+* Now accessing `http://<ip address>` will automatically forward to `http://<ip address>/wp-admin/install.php` to start the installation.
 
 ## 4.2 IPFS
 

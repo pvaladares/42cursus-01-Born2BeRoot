@@ -1,5 +1,41 @@
-# 42cursus-01-Born2beroot
-This project aims to introduce you to the wonderful world of virtualization.
+# Table of Contents
+
+- [1 - Virtual Machine (VirtualBox)](#1---virtual-machine-virtualbox)
+- [2 - Debian Installation](#2---debian-installation)
+	- [2.1 - General](#21---general)
+	- [2.2 - Disk partition (with bonus)](#22---disk-partition-with-bonus)
+	- [2.3 - Final installation steps](#23---final-installation-steps)
+	- [2.4 - Reboot, unlock the disk, login and check disk partitions](#24---reboot-unlock-the-disk-login-and-check-disk-partitions)
+- [3 - Mandatory part](#3---mandatory-part)
+	- [3.1 - apt and sudo](#31---apt-and-sudo)
+	- [3.2 - Adding in groups](#32---adding-in-groups)
+	- [3.3 - Setting up a strong password policy](#33---setting-up-a-strong-password-policy)
+		- [3.3.1 - login.defs - shadow password suite configuration](#331---logindefs---shadow-password-suite-configuration)
+		- [3.3.2 - pam_pwquality - PAM module to perform password quality checking](#332---pam_pwquality---pam-module-to-perform-password-quality-checking)
+		- [3.3.3 - sudoers - default sudo security policy plugin](#333---sudoers---default-sudo-security-policy-plugin)
+	- [3.4 ssh](#34-ssh)
+		- [3.4.1 - Installation](#341---installation)
+		- [3.4.2 - Configuration](#342---configuration)
+		- [3.4.3 - Connection from terminal](#343---connection-from-terminal)
+	- [3.5 ufw](#35-ufw)
+	- [3.6 cron](#36-cron)
+- [4 Bonus part](#4-bonus-part)
+	- [4.1 WordPress website](#41-wordpress-website)
+		- [4.1.1 lighttpd](#411-lighttpd)
+		- [4.1.2 MariaDB](#412-mariadb)
+		- [4.1.3 php](#413-php)
+		- [4.1.4 WordPress](#414-wordpress)
+	- [4.2 IPFS](#42-ipfs)
+	- [4.3 Final checks](#43-final-checks)
+- [5 - Preparation for Defense](#5---preparation-for-defense)
+	- [5.1 - Operating System (Debian), Package Managers (aptitude vs apt) and AppArmor](#51---operating-system-debian-package-managers-aptitude-vs-apt-and-apparmor)
+	- [5.2 - ssh](#52---ssh)
+	- [5.3 - ufw](#53---ufw)
+	- [5.4 - Users and Groups](#54---users-and-groups)
+	- [5.5 - cron](#55---cron)
+- [6 - Resources](#6---resources)
+
+
 
 # 1 - Virtual Machine (VirtualBox)
 
